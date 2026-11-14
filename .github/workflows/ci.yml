@@ -23,11 +23,15 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install -e ".[dev]"
+          pip install -e ".[full]"
 
       - name: Syntax & Compilation Verification
         run: |
           python -m py_compile $(find src scripts api app tests -name "*.py")
+
+      - name: Run Smoke Benchmark
+        run: |
+          python scripts/run_phase05_smoke.py
 
       - name: Run Test Suite
         run: |

@@ -2,12 +2,21 @@
 
 import os
 import pytest
-from fastapi.testclient import TestClient
-from api.server import app
+
+try:
+    from fastapi.testclient import TestClient
+    from api.server import app
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
+
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="FastAPI or TestClient not installed")
 
 
 @pytest.fixture
 def client():
+    if not HAS_FASTAPI:
+        pytest.skip("FastAPI not installed")
     return TestClient(app)
 
 

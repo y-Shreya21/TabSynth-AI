@@ -36,7 +36,8 @@ dependencies = [
 serving = [
     "fastapi>=0.110.0",
     "uvicorn[standard]>=0.28.0",
-    "streamlit>=1.32.0"
+    "streamlit>=1.32.0",
+    "httpx>=0.27.0"
 ]
 dev = [
     "pytest>=8.0.0",
@@ -46,6 +47,7 @@ full = [
     "fastapi>=0.110.0",
     "uvicorn[standard]>=0.28.0",
     "streamlit>=1.32.0",
+    "httpx>=0.27.0",
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0"
 ]
