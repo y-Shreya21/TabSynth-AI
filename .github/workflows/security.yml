@@ -1,0 +1,32 @@
+name: TabSynth AI Security & Secret Scanning
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+
+jobs:
+  security-audit:
+    name: Code & Dependency Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Secret Pattern Scanning
+        run: |
+          echo "[*] Scanning for potential private keys and token patterns..."
+          ! grep -rnE --exclude-dir={.git,.venv,artifacts} "(PRIVATE KEY|BEGIN RSA|api[_-]?key.*=.*['\"][a-zA-Z0-9]{20,}['\"])" .
+
+      - name: Data Privacy Inspection
+        run: |
+          echo "[*] Verifying that no raw or synthetic CSV files are tracked in Git..."
+          ! git ls-files | grep -E "(data/raw/.*\.csv|data/synthetic/.*\.csv|checkpoints/.*\.pt)"
