@@ -1,0 +1,113 @@
+# ==============================================================================
+# TabSynth AI: Master Configuration Template
+# Hybrid Transformer-MLP Diffusion for Heterogeneous Tabular Data
+# ==============================================================================
+
+# Hardware and System Acceleration Settings
+hardware:
+  device: "auto"                    # Options: "auto", "mps", "cuda", "cpu"
+  mps_fallback_cpu: true           # Fall back to CPU if an MPS operation is unsupported
+  float_precision: "float32"       # float32 is strictly enforced for numerical stability
+  empty_cache_per_epoch: true      # Call torch.mps.empty_cache() after every epoch
+  num_workers: 2                   # Pinned worker processes for DataLoader
+  seed: 42                         # Global deterministic seed across PyTorch, NumPy, Python
+
+# Dataset and Preprocessing Pipeline
+data:
+  dataset_name: "adult_income"     # "adult_income", "bank_marketing", "credit_default"
+  raw_data_path: "data/raw/adult.csv"
+  processed_dir: "data/processed/"
+  synthetic_dir: "data/synthetic/"
+  split_ratios: [0.70, 0.15, 0.15] # Stratified Train / Val / Test
+  target_column: "income"
+  continuous_scaler: "quantile"    # Options: "quantile" (Gaussian output), "robust", "standard"
+  quantile_noise: 1e-4             # Smoothing noise for tie-breaking in QuantileTransformer
+  categorical_missing_token: "<missing>"
+  categorical_unknown_token: "<unk>"
+
+# Hybrid Transformer-MLP Model Architecture
+model:
+  type: "hybrid_transformer_mlp"   # Options: "hybrid_transformer_mlp", "mlp_only_baseline"
+  d_model: 64                      # Feature embedding dimension
+  transformer:
+    layers: 2                      # Number of Pre-LN Transformer encoder blocks
+    heads: 4                       # Attention heads (d_k = d_v = 16)
+    ffn_dim: 256                   # Feed-forward hidden dimension (expansion factor 4)
+    dropout: 0.10
+    activation: "gelu"
+  denoiser_mlp:
+    layers: 3                      # Residual MLP denoising layers
+    hidden_dim: 256                # MLP layer width
+    dropout: 0.10
+    activation: "silu"
+    use_residual: true
+  conditioning:
+    time_embed_dim: 64             # Sinusoidal time embedding dimension
+    class_embed_dim: 64            # Target class conditioning embedding dimension
+    p_uncond: 0.15                 # Classifier-Free Guidance label dropout probability
+
+# Mixed-Type Diffusion Engine
+diffusion:
+  steps: 1000                      # Total diffusion steps T
+  schedule: "cosine"               # Noise schedule: "cosine" (Nichol & Dhariwal) or "linear"
+  beta_start: 0.0001
+  beta_end: 0.02
+  cosine_s: 0.008                  # Offset parameter for cosine schedule
+  multinomial:
+    loss_type: "d3pm_kl"           # Categorical KL divergence variational bound
+    transition_type: "uniform"     # Transition kernel: uniform noise over simplex
+
+# Optimization and Loss Weighting
+training:
+  batch_size: 256
+  learning_rate: 0.0002
+  weight_decay: 0.0001
+  optimizer: "adamw"               # AdamW with decoupled weight decay
+  lr_scheduler: "cosine_annealing"
+  warmup_epochs: 5
+  total_epochs: 150
+  gradient_clip_norm: 1.0          # Prevents gradient explosion
+  loss_weights:
+    lambda_num: 1.0                # Continuous Gaussian noise prediction MSE weight
+    lambda_cat: 0.2                # Discrete D3PM KL divergence loss weight
+    lambda_aux: 0.1                # Auxiliary clean-state cross-entropy weight
+  checkpoint:
+    save_dir: "checkpoints/"
+    save_interval_epochs: 10
+    keep_top_k: 3
+    monitor_metric: "val_loss_total"
+    mode: "min"
+
+# Reverse Sampling and Generation
+sampling:
+  num_samples: 10000
+  condition_strategy: "balanced"   # Options: "balanced", "empirical", "class_specific"
+  cfg_scale: 1.25                  # Classifier-Free Guidance scale w (1.0 - 2.0 recommended)
+  reverse_steps: 1000              # Number of reverse steps (striding supported down to 250)
+  export_format: "csv"
+
+# Comprehensive Evaluation & Privacy Auditing
+evaluation:
+  fidelity:
+    ks_test: true
+    wasserstein_distance: true
+    total_variation_distance: true
+    correlation_frobenius: true
+    c2st_discriminator: "lightgbm" # Classifier Two-Sample Test architecture
+    sdmetrics_report: true
+  utility:
+    classifiers: ["logistic_regression", "random_forest", "xgboost"]
+    test_protocol: "tstr"          # Train on Synthetic, Test on Real (vs TRTR)
+    metrics: ["accuracy", "macro_f1", "balanced_accuracy", "minority_recall", "auroc", "auprc"]
+  privacy:
+    dcr_analysis: true             # Distance-to-Closest-Record distribution
+    nndr_analysis: true            # Nearest Neighbor Distance Ratio
+    membership_inference: true     # Shadow model MIA attack
+    sample_size_audit: 5000        # Subsample count for pairwise distance evaluation
+
+# Experiment Tracking
+telemetry:
+  use_mlflow: true
+  mlflow_experiment_name: "TabSynth_AI_Benchmarks"
+  use_tensorboard: true
+  tensorboard_log_dir: "experiments/logs/tensorboard/"

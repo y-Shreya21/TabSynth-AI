@@ -1,0 +1,87 @@
+# Python Bytecode & Compilation Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment Variables & Secrets (CRITICAL FOR SECURITY)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+
+# IDE & Editor Configurations
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Local Datasets & Generated Data (CRITICAL FOR PRIVACY & NFR-09)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/synthetic/*
+!data/synthetic/.gitkeep
+datasets/
+synthetic_data/
+generated_data/
+outputs/private/
+
+# Model Checkpoints & Serialized Artifacts
+checkpoints/*
+!checkpoints/.gitkeep
+artifacts/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+
+# Experiment Outputs & Telemetry Logs
+experiments/logs/*
+!experiments/logs/.gitkeep
+experiments/results/*
+!experiments/results/.gitkeep
+mlruns/
+.mlflow/
+logs/
+tensorboard/
+
+# Pytest & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/

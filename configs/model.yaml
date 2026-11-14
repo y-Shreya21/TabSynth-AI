@@ -1,0 +1,40 @@
+# ==============================================================================
+# TabSynth AI - Denoising Model Configuration
+# ==============================================================================
+
+model:
+  # Architecture selection: "hybrid" | "mlp_baseline"
+  architecture_type: "hybrid"
+
+  # Core tokenization and projection dimensions
+  d_model: 64
+
+  # Transformer feature encoder configuration (used in hybrid architecture)
+  transformer:
+    attention_heads: 4
+    num_layers: 2
+    dim_feedforward: 256
+    dropout: 0.1
+    activation: "GELU"
+    normalization: "LayerNorm"
+
+  # Feature residual MLP denoiser configuration
+  mlp:
+    hidden_dim: 256
+    num_layers: 2
+    dropout: 0.1
+    activation: "GELU"
+    normalization: "LayerNorm"
+
+  # Conditioning configuration
+  conditioning:
+    num_classes: 2
+    class_embed_dim: 64
+    p_uncond: 0.15              # Dropout probability for classifier-free guidance
+    time_embed_type: "sinusoidal"
+    time_embed_max_period: 10000.0
+
+  # Dataset-dependent defaults (overridden per dataset during training)
+  features:
+    num_continuous: 6
+    cardinalities: [8, 16, 7, 14, 6, 5, 2, 41]

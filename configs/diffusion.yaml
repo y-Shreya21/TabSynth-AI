@@ -1,0 +1,42 @@
+# ==============================================================================
+# TabSynth AI - Tabular Diffusion Engine Configuration
+# ==============================================================================
+
+diffusion:
+  # Timestep configurations
+  numerical_timesteps: 100
+  categorical_timesteps: 100
+
+  # Schedules
+  numerical_schedule: "cosine"        # "cosine" | "linear"
+  categorical_schedule: "cosine"      # "cosine" | "linear"
+  categorical_transition: "uniform"   # Uniform transition kernel Q_t = alpha_t * I + (1 - alpha_t) * U
+
+  # Schedule parameters
+  linear:
+    beta_start: 0.0001
+    beta_end: 0.02
+  cosine:
+    s: 0.008
+    max_beta: 0.999
+
+  # Loss configurations
+  loss:
+    numerical_loss_type: "mse"        # "mse" (Epsilon-prediction score matching)
+    categorical_loss_type: "kl"       # "kl" (Exact D3PM Variational KL divergence)
+    lambda_numerical: 1.0             # Weight on continuous MSE loss
+    lambda_categorical: 1.0           # Weight on discrete KL divergence loss
+    lambda_auxiliary: 0.2             # Weight on clean-category cross-entropy regularizer
+    reduction: "mean"
+
+  # Sampling parameters
+  sampling:
+    clip_denoised: true
+    clip_range: [-5.0, 5.0]
+    return_intermediate_steps: false
+
+  # Execution environment
+  system:
+    precision: "float32"              # Strict float32 precision across diffusion steps
+    device: "auto"                    # "auto" (prioritizes Apple Silicon MPS) | "mps" | "cpu" | "cuda"
+    seed: 42

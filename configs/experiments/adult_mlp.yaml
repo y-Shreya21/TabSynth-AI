@@ -1,0 +1,50 @@
+# TabSynth AI - Experiment Configuration: UCI Adult Income (TabDDPM MLP Baseline)
+
+experiment:
+  name: "adult_income_mlp"
+  description: "Class-conditional ablation training of TabDDPM MLP baseline on UCI Adult Income"
+  seed: 42
+
+data:
+  raw_data_path: "data/raw/adult.csv"
+  target_column: "income"
+  split_ratios: [0.70, 0.15, 0.15]
+  batch_size: 256
+  num_workers: 0
+
+diffusion:
+  steps: 100
+  numerical_schedule: "cosine"
+  categorical_schedule: "cosine"
+  lambda_num: 1.0
+  lambda_cat: 0.2
+  lambda_aux: 0.1
+
+model:
+  type: "mlp_baseline"
+  d_model: 64
+  denoiser_mlp:
+    layers: 3
+    hidden_dim: 256
+    dropout: 0.1
+  conditioning:
+    p_uncond: 0.15
+
+training:
+  total_epochs: 20
+  learning_rate: 2.0e-4
+  weight_decay: 1.0e-4
+  max_grad_norm: 1.0
+  device: "auto"
+  optimizer: "adamw"
+  scheduler: "cosine"
+  warmup_epochs: 2
+  min_lr: 1.0e-6
+  early_stopping:
+    enabled: true
+    patience: 10
+    min_delta: 0.0001
+  checkpoint:
+    save_dir: "checkpoints/"
+    keep_top_k: 2
+    prefix: "adult_mlp"

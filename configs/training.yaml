@@ -1,0 +1,42 @@
+# TabSynth AI - Master Training Configuration
+
+training:
+  total_epochs: 50
+  batch_size: 256
+  learning_rate: 2.0e-4
+  weight_decay: 1.0e-4
+  max_grad_norm: 1.0
+  device: "auto"
+
+optimizer:
+  type: "adamw"
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  use_param_groups: true
+
+scheduler:
+  type: "cosine"
+  warmup_epochs: 5
+  min_lr: 1.0e-6
+
+early_stopping:
+  enabled: true
+  patience: 15
+  min_delta: 0.0001
+  mode: "min"
+  restore_best_weights: true
+
+loss_weights:
+  lambda_num: 1.0
+  lambda_cat: 0.2
+  lambda_aux: 0.1
+
+checkpoint:
+  save_dir: "checkpoints/"
+  keep_top_k: 2
+  save_frequency_epochs: 1
+  prefix: "tabsynth"
+
+telemetry:
+  verbose_interval: 5
+  seed: 42

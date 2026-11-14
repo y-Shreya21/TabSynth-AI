@@ -1,0 +1,54 @@
+# Git
+.git/
+.gitignore
+
+# Python Bytecode and Caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Data & Datasets (Privacy & Size Safeguards)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/synthetic/*
+!data/synthetic/.gitkeep
+
+# Checkpoints and Artifacts
+checkpoints/*
+!checkpoints/.gitkeep
+artifacts/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+
+# Experiment Logs & Runs
+experiments/logs/*
+!experiments/logs/.gitkeep
+experiments/results/*
+!experiments/results/.gitkeep
+mlruns/
+.mlflow/
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store

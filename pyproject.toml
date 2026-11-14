@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tabsynth"
+version = "0.1.0"
+description = "Hybrid Transformer-MLP Diffusion Framework for Privacy-Aware, High-Fidelity, and Class-Conditional Tabular Data Generation"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "TabSynth AI Research Team"}
+]
+keywords = [
+    "generative-ai",
+    "tabular-data",
+    "diffusion-models",
+    "transformers",
+    "synthetic-data",
+    "differential-privacy",
+    "pytorch"
+]
+dependencies = [
+    "torch>=2.2.0",
+    "numpy>=1.26.0",
+    "scipy>=1.12.0",
+    "pandas>=2.2.0",
+    "scikit-learn>=1.4.0",
+    "pyyaml>=6.0.1",
+    "pydantic>=2.6.0",
+    "plotly>=5.19.0"
+]
+
+[project.optional-dependencies]
+serving = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.28.0",
+    "streamlit>=1.32.0"
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0"
+]
+full = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.28.0",
+    "streamlit>=1.32.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = [".", "src"]
+testpaths = ["tests"]
+addopts = "-ra -q"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning"
+]
