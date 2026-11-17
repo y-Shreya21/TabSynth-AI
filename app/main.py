@@ -1,6 +1,13 @@
 """TabSynth Analytics: Production-Grade Scientific Dashboard for Tabular Generative Modeling."""
 
 import os
+import sys
+
+# Ensure repository root is on sys.path for direct Streamlit execution
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 import glob
 import json
 import time
@@ -17,7 +24,12 @@ from api.services.model_service import ModelService
 from api.services.generation_service import GenerationService
 from api.services.evaluation_service import EvaluationService
 from api.services.job_service import job_manager
-from app.api_client import client as api_client
+
+try:
+    from app.api_client import client as api_client
+except ImportError:
+    from api_client import client as api_client
+
 from tabsynth.training.trainer import select_device
 
 # Page Configuration
