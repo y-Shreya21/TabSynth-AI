@@ -1,26 +1,26 @@
-"""TabSynth Analytics: Interactive Research Dashboard for Tabular Generative Modeling."""
+"""TabSynth Analytics: Production-Grade Scientific Dashboard for Tabular Generative Modeling."""
 
 import os
 import glob
 import json
+import time
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from tabsynth.data.schema import infer_table_schema
-from tabsynth.data.preprocessor import TabularPreprocessor
-from tabsynth.training.checkpoint import CheckpointManager
-from tabsynth.diffusion.gaussian import GaussianDiffusion
-from tabsynth.diffusion.multinomial import MultinomialDiffusion
-from tabsynth.models.hybrid import TabSynthHybridModel
-from tabsynth.sampling.sampler import TabSynthSampler
+from api.config import settings
+from api.db.repositories import DatasetRepository, ModelRepository, JobRepository, ExperimentRepository
+from api.services.dataset_service import DatasetService
+from api.services.model_service import ModelService
+from api.services.generation_service import GenerationService
+from api.services.evaluation_service import EvaluationService
+from api.services.job_service import job_manager
+from app.api_client import client as api_client
 from tabsynth.training.trainer import select_device
-from tabsynth.evaluation.fidelity import evaluate_statistical_fidelity
-from tabsynth.evaluation.utility import evaluate_downstream_utility
-from tabsynth.evaluation.privacy import evaluate_empirical_privacy
 
+# Page Configuration
 st.set_page_config(
     page_title="TabSynth Analytics",
     page_icon="🧬",
@@ -28,342 +28,538 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.title("🧬 TabSynth Analytics")
-st.caption("Hybrid Transformer-MLP Diffusion Framework for Privacy-Aware & Class-Conditional Tabular Synthesis")
+# Custom SaaS Typography and Styling
+st.markdown("""
+<style>
+    .metric-card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid #e9ecef;
+    }
+    .stButton>button {
+        border-radius: 6px;
+    }
+    .badge-status {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# Sidebar Navigation
-sidebar_nav = st.sidebar.radio(
+# Application Header
+st.title("🧬 TabSynth Analytics")
+st.caption("Production Application: Hybrid Transformer-MLP Diffusion Framework for Privacy-Aware & Class-Conditional Tabular Synthesis")
+
+# Sidebar Status & Navigation
+backend_online = api_client.is_online()
+if backend_online:
+    st.sidebar.success("🟢 API Server: Online (FastAPI)")
+else:
+    st.sidebar.warning("🟡 API Server: Offline (Direct Engine)")
+
+page = st.sidebar.radio(
     "Navigation",
     [
-        "Dashboard Overview",
-        "Dataset Manager & Ingestion",
-        "Schema Explorer",
-        "Conditional Generator",
-        "Real vs Synthetic Comparison",
-        "Statistical Fidelity",
-        "Downstream Utility (TSTR)",
-        "Empirical Privacy Audit",
-        "Experiment History & Export",
+        "Page 1: Overview Dashboard",
+        "Page 2: Dataset Manager",
+        "Page 3: Model Training",
+        "Page 4: Synthetic Data Generator",
+        "Page 5: Fidelity Dashboard",
+        "Page 6: Utility Dashboard",
+        "Page 7: Privacy Audit",
+        "Page 8: Experiment Explorer",
     ],
 )
 
 
-@st.cache_data
+# Helper function to load datasets
+@st.cache_data(ttl=60)
 def load_csv(path: str) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-# -----------------------------------------------------------------------------
-# 1. Dashboard Overview
-# -----------------------------------------------------------------------------
-if sidebar_nav == "Dashboard Overview":
-    st.markdown("### Executive System Summary")
-    col1, col2, col3, col4 = st.columns(4)
+# =============================================================================
+# Page 1: Overview Dashboard
+# =============================================================================
+if page == "Page 1: Overview Dashboard":
+    st.subheader("System Overview & Scientific Dashboard")
 
-    device = select_device("auto")
-    col1.metric("Compute Device", str(device).upper())
-    col2.metric("Architecture", "Transformer-MLP")
-    col3.metric("Continuous Engine", "Gaussian DDPM")
-    col4.metric("Categorical Engine", "Multinomial D3PM")
+    datasets = DatasetRepository.list_all()
+    models = ModelRepository.list_all()
+    jobs = JobRepository.list_all(limit=50)
+    experiments = ExperimentRepository.list_all()
 
-    st.markdown("""
-    #### 🔬 Three Research Objectives
-    1. **High-Fidelity Generation:** Replicates continuous marginal distributions, non-linear cross-column dependencies, and categorical frequencies.
-    2. **Class-Conditional Steerability:** Uses Classifier-Free Guidance (CFG) and balanced condition sampling to synthesize minority records on demand.
-    3. **Privacy-Aware Modeling:** Suppresses training-set memorization, verified through empirical Distance-to-Closest-Record (DCR) and Membership Inference Attack (MIA) diagnostics.
-    """)
-
-    st.info("Select a workflow from the left sidebar to inspect schemas, synthesize data, or run scientific benchmarks.")
-
-
-# -----------------------------------------------------------------------------
-# 2. Dataset Manager & Ingestion
-# -----------------------------------------------------------------------------
-elif sidebar_nav == "Dataset Manager & Ingestion":
-    st.markdown("### Dataset Manager")
-    st.write("Inspect existing datasets or upload a new heterogeneous tabular CSV file.")
-
-    available_csvs = sorted(glob.glob("data/raw/*.csv"))
-    selected_file = st.selectbox("Select Raw Dataset", available_csvs if available_csvs else ["data/raw/adult.csv"])
-
-    if selected_file and os.path.exists(selected_file):
-        df = load_csv(selected_file)
-        st.success(f"Loaded `{selected_file}`: **{len(df):,}** rows × **{len(df.columns)}** columns.")
-        st.dataframe(df.head(10), use_container_width=True)
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Registered Datasets", len(datasets))
+    c2.metric("Trained Models", len(models))
+    c3.metric("Total Jobs Executed", len(jobs))
+    c4.metric("Saved Experiments", len(experiments))
 
     st.markdown("---")
-    st.markdown("#### Upload Custom Dataset")
-    uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
-    if uploaded_file is not None:
-        save_path = os.path.join("data/raw", uploaded_file.name)
-        with open(save_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        st.success(f"File uploaded to `{save_path}`. Reload or select from above.")
+
+    col_left, col_right = st.columns([3, 2])
+    with col_left:
+        st.markdown("#### Hardware & Diffusion Infrastructure")
+        device = select_device("auto")
+        inf_col1, inf_col2, inf_col3 = st.columns(3)
+        inf_col1.metric("Compute Accelerator", str(device).upper())
+        inf_col2.metric("Continuous Engine", "Gaussian DDPM")
+        inf_col3.metric("Categorical Engine", "Multinomial D3PM")
+
+        st.markdown("""
+        **Core Research Capabilities:**
+        - **Mixed-Type Diffusion:** Dual continuous and categorical forward noise schedules with analytical reverse transitions.
+        - **Transformer-MLP Backbone:** Inter-feature self-attention mechanism capturing complex multi-column dependencies.
+        - **Class-Conditional Guidance:** Controllable synthetic distribution steering via Classifier-Free Guidance (CFG).
+        - **Zero-Leakage Guarantee:** Training partition isolated with quantile transforms and strict validation splits.
+        """)
+
+    with col_right:
+        st.markdown("#### Recent Job History")
+        if jobs:
+            job_rows = [
+                {
+                    "ID": j.id,
+                    "Type": j.job_type.title(),
+                    "Status": j.status.upper(),
+                    "Progress": f"{int(j.progress * 100)}%",
+                    "Updated": j.updated_at[:19] if j.updated_at else "-",
+                }
+                for j in jobs[:6]
+            ]
+            st.dataframe(pd.DataFrame(job_rows), use_container_width=True)
+        else:
+            st.info("No background jobs recorded yet. Ingest data and start training.")
 
 
-# -----------------------------------------------------------------------------
-# 3. Schema Explorer
-# -----------------------------------------------------------------------------
-elif sidebar_nav == "Schema Explorer":
-    st.markdown("### Schema Explorer & Feature Typing")
-    available_csvs = sorted(glob.glob("data/raw/*.csv"))
-    selected_file = st.selectbox("Select Dataset to Profile", available_csvs if available_csvs else ["data/raw/adult.csv"])
+# =============================================================================
+# Page 2: Dataset Manager
+# =============================================================================
+elif page == "Page 2: Dataset Manager":
+    st.subheader("Dataset Ingestion & Tabular Schema Profiler")
 
-    if selected_file and os.path.exists(selected_file):
-        df = load_csv(selected_file)
-        target_col = st.selectbox("Select Target Variable", [c for c in df.columns if df[c].nunique() < 10], index=len([c for c in df.columns if df[c].nunique() < 10]) - 1)
+    tab_inspect, tab_upload = st.tabs(["Inspect Registered Datasets", "Upload New CSV"])
 
-        schema = infer_table_schema(df, target_column=target_col)
+    with tab_upload:
+        st.markdown("#### Upload Heterogeneous Tabular Dataset")
+        up_file = st.file_uploader("Upload CSV file (Max 50MB)", type=["csv"])
+        col_up1, col_up2 = st.columns(2)
+        with col_up1:
+            dataset_name = st.text_input("Dataset Alias", value="")
+        with col_up2:
+            target_col = st.text_input("Target Column for Conditioning (Optional)", value="")
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown(f"**Continuous Features ({len(schema.continuous_columns)}):**")
-            st.write(schema.continuous_columns)
-        with col2:
-            st.markdown(f"**Categorical Features ({len(schema.categorical_columns)}):**")
-            cat_card_dict = {col: card for col, card in zip(schema.categorical_columns, schema.cardinalities)}
-            st.json(cat_card_dict)
+        if up_file and st.button("Ingest & Profile Dataset", type="primary"):
+            with st.spinner("Validating and profiling schema..."):
+                file_bytes = up_file.getvalue()
+                try:
+                    if backend_online:
+                        res = api_client.upload_dataset(
+                            file_bytes=file_bytes,
+                            filename=up_file.name,
+                            name=dataset_name or up_file.name.replace(".csv", ""),
+                            target_column=target_col or None,
+                        )
+                        st.success(f"Uploaded `{res['name']}`! Ingested {res['num_rows']} rows × {res['num_columns']} columns.")
+                    else:
+                        rec = DatasetService.upload_dataset(
+                            file_bytes=file_bytes,
+                            filename=up_file.name,
+                            name=dataset_name or up_file.name.replace(".csv", ""),
+                            target_column=target_col or None,
+                        )
+                        st.success(f"Saved `{rec.name}` locally! Ingested {rec.num_rows} rows × {rec.num_columns} columns.")
+                except Exception as exc:
+                    st.error(f"Ingestion failed: {exc}")
 
-        if schema.class_distribution:
-            st.markdown("#### Target Class Distribution")
-            fig = px.bar(
-                x=list(schema.class_distribution.keys()),
-                y=list(schema.class_distribution.values()),
-                labels={"x": "Class", "y": "Empirical Frequency"},
-                title=f"Target Distribution for '{target_col}'",
-            )
-            st.plotly_chart(fig, use_container_width=True)
+    with tab_inspect:
+        registered = DatasetRepository.list_all()
+        # Fallback to local files if DB is empty
+        file_options = {}
+        for r in registered:
+            file_options[f"{r.name} ({r.id})"] = (r.file_path, r.id, r.target_column)
+
+        for p in sorted(glob.glob("data/raw/*.csv")):
+            bname = os.path.basename(p)
+            if not any(bname in k for k in file_options):
+                file_options[f"Local: {bname}"] = (p, None, None)
+
+        if not file_options:
+            st.info("No datasets available. Please upload a dataset in the Upload tab.")
+        else:
+            selected_label = st.selectbox("Select Dataset to Profile", list(file_options.keys()))
+            selected_path, ds_id, ds_target = file_options[selected_label]
+
+            if os.path.exists(selected_path):
+                df = load_csv(selected_path)
+                m1, m2, m3 = st.columns(3)
+                m1.metric("Total Records", f"{len(df):,}")
+                m2.metric("Total Columns", len(df.columns))
+                m3.metric("Missing Values", int(df.isnull().sum().sum()))
+
+                st.markdown("#### Sample Records (Top 10)")
+                st.dataframe(df.head(10), use_container_width=True)
+
+                st.markdown("---")
+                col_c, col_d = st.columns(2)
+                with col_c:
+                    num_cols = [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c])]
+                    st.markdown(f"**Continuous Features ({len(num_cols)}):**")
+                    st.write(num_cols)
+
+                with col_d:
+                    cat_cols = [c for c in df.columns if not pd.api.types.is_numeric_dtype(df[c])]
+                    st.markdown(f"**Categorical Features ({len(cat_cols)}):**")
+                    st.write(cat_cols)
+
+                # Class distribution
+                candidate_targets = [c for c in df.columns if df[c].nunique() <= 10]
+                if candidate_targets:
+                    st.markdown("#### Target Class Distribution")
+                    chosen_target = st.selectbox("Target Variable", candidate_targets, index=candidate_targets.index(ds_target) if ds_target in candidate_targets else 0)
+                    dist = df[chosen_target].value_counts(normalize=True).reset_index()
+                    dist.columns = ["class", "frequency"]
+                    fig = px.bar(dist, x="class", y="frequency", title=f"Class Balance for '{chosen_target}'")
+                    st.plotly_chart(fig, use_container_width=True)
 
 
-# -----------------------------------------------------------------------------
-# 4. Conditional Generator
-# -----------------------------------------------------------------------------
-elif sidebar_nav == "Conditional Generator":
-    st.markdown("### Class-Conditional Synthetic Data Generator")
+# =============================================================================
+# Page 3: Model Training
+# =============================================================================
+elif page == "Page 3: Model Training":
+    st.subheader("Model Configuration & Training Pipeline")
 
-    checkpoints = sorted(glob.glob("checkpoints/*.pt"))
-    if not checkpoints:
-        st.warning("No trained checkpoints found in `checkpoints/`. Train a model first via `scripts/train.py`.")
+    datasets = DatasetRepository.list_all()
+    ds_choices = {f"{d.name} ({d.id})": d for d in datasets}
+    if not ds_choices:
+        for p in sorted(glob.glob("data/raw/*.csv")):
+            ds_choices[f"Local: {os.path.basename(p)}"] = p
+
+    if not ds_choices:
+        st.warning("No datasets available. Please upload a dataset in Dataset Manager.")
     else:
-        selected_ckpt = st.selectbox("Select Checkpoint", checkpoints)
-        col1, col2 = st.columns(2)
-        with col1:
-            num_samples = st.slider("Samples to Generate", min_value=100, max_value=5000, value=500, step=100)
-            condition_mode = st.selectbox("Conditioning Strategy", ["balanced", "natural", "class_specific", "unconditional"])
-        with col2:
-            cfg_scale = st.slider("Classifier-Free Guidance Scale (w)", min_value=0.0, max_value=3.0, value=1.25, step=0.25)
-            steps = st.slider("Reverse Diffusion Steps", min_value=20, max_value=200, value=50, step=10)
-
-        output_path = st.text_input("Output CSV Path", value="data/synthetic/dashboard_synthetic.csv")
-
-        if st.button("🚀 Synthesize Tabular Records", type="primary"):
-            with st.spinner("Executing class-conditional reverse diffusion..."):
-                device = select_device("auto")
-                ckpt = CheckpointManager.load(checkpoint_path=selected_ckpt, device=device)
-                preproc = ckpt["preprocessor"]
-                sch = preproc.schema
-
-                num_classes = len(sch.class_distribution) if sch.class_distribution else 2
-                model = TabSynthHybridModel(
-                    num_continuous=len(sch.continuous_columns),
-                    cardinalities=sch.cardinalities,
-                    num_classes=num_classes,
-                    d_model=64,
-                )
-                model.load_state_dict(ckpt["model_state_dict"])
-                model.to(device)
-
-                g_diff = GaussianDiffusion(num_timesteps=steps, device=device)
-                m_diff = MultinomialDiffusion(cardinalities=sch.cardinalities, num_timesteps=steps, device=device)
-
-                sampler = TabSynthSampler(
-                    model=model,
-                    gaussian_diffusion=g_diff,
-                    multinomial_diffusion=m_diff,
-                    preprocessor=preproc,
-                    device=device,
-                )
-
-                synth_df = sampler.sample(
-                    num_samples=num_samples,
-                    batch_size=256,
-                    condition_strategy=condition_mode,
-                    cfg_scale=cfg_scale,
-                )
-
-                os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
-                synth_df.to_csv(output_path, index=False)
-                st.success(f"Generated {len(synth_df)} records! Saved to `{output_path}`.")
-                st.dataframe(synth_df.head(10), use_container_width=True)
-
-
-# -----------------------------------------------------------------------------
-# 5. Real vs Synthetic Comparison
-# -----------------------------------------------------------------------------
-elif sidebar_nav == "Real vs Synthetic Comparison":
-    st.markdown("### Real vs. Synthetic Feature Distributions")
-    real_files = sorted(glob.glob("data/raw/*.csv"))
-    synth_files = sorted(glob.glob("data/synthetic/*.csv"))
-
-    if not synth_files:
-        st.info("No synthetic CSVs found in `data/synthetic/`. Generate samples first.")
-    else:
-        col1, col2 = st.columns(2)
-        with col1:
-            real_file = st.selectbox("Real Dataset", real_files)
-        with col2:
-            synth_file = st.selectbox("Synthetic Dataset", synth_files)
-
-        if real_file and synth_file:
-            df_r = load_csv(real_file)
-            df_s = load_csv(synth_file)
-
-            common_cols = [c for c in df_r.columns if c in df_s.columns]
-            feat = st.selectbox("Select Feature to Compare", common_cols)
-
-            if pd.api.types.is_numeric_dtype(df_r[feat]):
-                fig = go.Figure()
-                fig.add_trace(go.Histogram(x=df_r[feat], name="Real Data", opacity=0.6, histnorm="probability density"))
-                fig.add_trace(go.Histogram(x=df_s[feat], name="Synthetic Data", opacity=0.6, histnorm="probability density"))
-                fig.update_layout(barmode="overlay", title=f"Continuous Density: {feat}")
-                st.plotly_chart(fig, use_container_width=True)
+        col_cfg1, col_cfg2 = st.columns(2)
+        with col_cfg1:
+            sel_ds_key = st.selectbox("Training Dataset", list(ds_choices.keys()))
+            chosen_obj = ds_choices[sel_ds_key]
+            if isinstance(chosen_obj, str):
+                dpath = chosen_obj
+                ds_id = None
+                df_temp = load_csv(dpath)
+                candidate_targets = [c for c in df_temp.columns if df_temp[c].nunique() <= 10]
             else:
-                p_r = df_r[feat].value_counts(normalize=True).reset_index()
-                p_r.columns = ["category", "real_freq"]
-                p_s = df_s[feat].value_counts(normalize=True).reset_index()
-                p_s.columns = ["category", "synth_freq"]
+                dpath = chosen_obj.file_path
+                ds_id = chosen_obj.id
+                candidate_targets = [chosen_obj.target_column] if chosen_obj.target_column else ["income"]
 
-                merged = pd.merge(p_r, p_s, on="category", how="outer").fillna(0.0)
-                fig = px.bar(
-                    merged,
-                    x="category",
-                    y=["real_freq", "synth_freq"],
-                    barmode="group",
-                    title=f"Categorical Frequency: {feat}",
-                )
-                st.plotly_chart(fig, use_container_width=True)
+            target_col = st.selectbox("Target Column for Guidance", candidate_targets)
+            model_type = st.radio("Denoising Backbone Architecture", ["hybrid_transformer_mlp", "mlp_baseline"], format_func=lambda x: "Hybrid Transformer-MLP (Recommended)" if x == "hybrid_transformer_mlp" else "TabDDPM Residual MLP Baseline")
+            model_name = st.text_input("Model Alias", value=f"{model_type}_run")
+
+        with col_cfg2:
+            epochs = st.slider("Training Epochs", min_value=1, max_value=100, value=20, step=1)
+            steps = st.slider("Diffusion Timesteps (T)", min_value=10, max_value=200, value=50, step=10)
+            batch_size = st.select_slider("Batch Size", options=[64, 128, 256, 512], value=256)
+            lr = st.select_slider("Learning Rate", options=[1e-4, 2e-4, 5e-4, 1e-3], value=2e-4)
+            dev_choice = st.selectbox("Compute Device", ["auto", "mps", "cpu", "cuda"])
+
+        if st.button("🚀 Launch Asynchronous Training Job", type="primary"):
+            with st.spinner("Dispatching background training worker..."):
+                train_payload = {
+                    "data_path": dpath,
+                    "dataset_id": ds_id,
+                    "model_name": model_name,
+                    "target_column": target_col,
+                    "model_type": model_type,
+                    "hyperparameters": {
+                        "epochs": epochs,
+                        "diffusion_steps": steps,
+                        "batch_size": batch_size,
+                        "learning_rate": lr,
+                    },
+                    "device": dev_choice,
+                }
+                try:
+                    if backend_online:
+                        res = api_client.start_training(train_payload)
+                        st.success(f"Job launched successfully! Job ID: `{res['job_id']}`")
+                        st.info("Monitor live training progress in the job table below.")
+                    else:
+                        from api.schemas.models import TrainRequest, TrainHyperparameters
+                        req = TrainRequest(
+                            data_path=dpath,
+                            dataset_id=ds_id,
+                            model_name=model_name,
+                            target_column=target_col,
+                            model_type=model_type,
+                            hyperparameters=TrainHyperparameters(
+                                epochs=epochs,
+                                diffusion_steps=steps,
+                                batch_size=batch_size,
+                                learning_rate=lr,
+                            ),
+                            device=dev_choice,
+                        )
+                        job_id = ModelService.start_training_job(req)
+                        st.success(f"Job launched locally! Job ID: `{job_id}`")
+                except Exception as exc:
+                    st.error(f"Failed to start training: {exc}")
+
+    st.markdown("---")
+    st.markdown("#### Active & Recent Training Jobs")
+    training_jobs = [j for j in JobRepository.list_all(limit=20) if j.job_type == "training"]
+    if training_jobs:
+        for j in training_jobs[:5]:
+            with st.expander(f"Job {j.id} — Status: {j.status.upper()} (Progress: {int(j.progress * 100)}%)", expanded=(j.status == "running")):
+                st.progress(j.progress)
+                st.write(f"Step: {j.current_step} / {j.total_steps}")
+                if j.result:
+                    st.json(j.result)
+                if j.error:
+                    st.error(f"Error: {j.error}")
+                if j.status in ["queued", "running"]:
+                    if st.button(f"Cancel Job {j.id}", key=f"btn_cancel_{j.id}"):
+                        job_manager.cancel_job(j.id)
+                        st.warning("Cancellation requested.")
 
 
-# -----------------------------------------------------------------------------
-# 6. Statistical Fidelity Dashboard
-# -----------------------------------------------------------------------------
-elif sidebar_nav == "Statistical Fidelity":
-    st.markdown("### Statistical Fidelity Benchmark")
-    real_files = sorted(glob.glob("data/raw/*.csv"))
-    synth_files = sorted(glob.glob("data/synthetic/*.csv"))
+# =============================================================================
+# Page 4: Synthetic Data Generator
+# =============================================================================
+elif page == "Page 4: Synthetic Data Generator":
+    st.subheader("Class-Conditional Synthetic Tabular Generator")
 
-    if not synth_files:
-        st.info("Generate synthetic data first.")
+    models = ModelRepository.list_all()
+    model_choices = {f"{m.name} ({m.model_type}) - {m.id}": m.checkpoint_path for m in models}
+
+    for ckpt_path in sorted(glob.glob("checkpoints/*/*.pt") + glob.glob("checkpoints/*.pt")):
+        bname = os.path.basename(ckpt_path)
+        if ckpt_path not in model_choices.values():
+            model_choices[f"Checkpoint: {bname} ({os.path.dirname(ckpt_path)})"] = ckpt_path
+
+    if not model_choices:
+        st.warning("No model checkpoints available. Train a model in Model Training first.")
     else:
-        real_f = st.selectbox("Real Dataset", real_files, key="fid_real")
-        synth_f = st.selectbox("Synthetic Dataset", synth_files, key="fid_synth")
+        col_g1, col_g2 = st.columns(2)
+        with col_g1:
+            sel_model_label = st.selectbox("Select Model Checkpoint", list(model_choices.keys()))
+            selected_ckpt = model_choices[sel_model_label]
+            num_samples = st.slider("Number of Records to Generate", min_value=100, max_value=5000, value=500, step=100)
+            condition_mode = st.selectbox("Conditioning Strategy", ["balanced", "natural", "class_specific", "unconditional"])
 
-        if st.button("Run Fidelity Evaluation"):
-            df_r = load_csv(real_f)
-            df_s = load_csv(synth_f)
-            sch = infer_table_schema(df_r)
+        with col_g2:
+            specific_cls = None
+            if condition_mode == "class_specific":
+                specific_cls = st.number_input("Target Class Index (e.g. 1 for minority)", min_value=0, max_value=10, value=1)
+            cfg_scale = st.slider("Classifier-Free Guidance Scale (w)", min_value=0.0, max_value=3.0, value=1.25, step=0.25)
+            steps = st.slider("Reverse Sampling Steps", min_value=10, max_value=200, value=50, step=10)
+            output_name = st.text_input("Output CSV Filename", value="data/synthetic/generated_samples.csv")
 
-            with st.spinner("Computing KS tests, TVD, and C2ST indistinguishability..."):
-                res = evaluate_statistical_fidelity(
-                    real_df=df_r,
-                    synth_df=df_s,
-                    continuous_cols=sch.continuous_columns,
-                    categorical_cols=sch.categorical_columns,
-                )
+        if st.button("🚀 Generate Synthetic Records", type="primary"):
+            with st.spinner("Executing reverse diffusion trajectory with Classifier-Free Guidance..."):
+                gen_payload = {
+                    "checkpoint_path": selected_ckpt,
+                    "num_samples": num_samples,
+                    "condition_strategy": condition_mode,
+                    "specific_class": specific_cls,
+                    "cfg_scale": cfg_scale,
+                    "steps": steps,
+                    "output_path": output_name,
+                }
+                try:
+                    if backend_online:
+                        res = api_client.generate(gen_payload)
+                        out_path = res["output_path"]
+                        st.success(f"Successfully generated {res['num_samples']} records! Saved to `{out_path}`.")
+                    else:
+                        from api.schemas.generation import GenerateRequest
+                        req = GenerateRequest(**gen_payload)
+                        res = GenerationService.generate(req)
+                        out_path = res.output_path
+                        st.success(f"Generated {res.num_samples} records! Saved to `{out_path}`.")
 
-            m1, m2, m3, m4 = st.columns(4)
-            m1.metric("Mean KS Statistic", f"{res['mean_kolmogorov_smirnov']:.4f}")
-            m2.metric("Mean TVD", f"{res['mean_total_variation_distance']:.4f}")
-            m3.metric("Correlation Frobenius Dist", f"{res['correlation_frobenius_distance']:.4f}")
-            m4.metric("C2ST Accuracy", f"{res['c2st_accuracy']:.4f}")
-
-            st.json(res["per_column_ks"])
-
-
-# -----------------------------------------------------------------------------
-# 7. Downstream Utility (TSTR)
-# -----------------------------------------------------------------------------
-elif sidebar_nav == "Downstream Utility (TSTR)":
-    st.markdown("### Train on Synthetic, Test on Real (TSTR) Benchmark")
-    st.write("Trains downstream ML models on synthetic data and tests strictly on the real dataset.")
-
-    real_files = sorted(glob.glob("data/raw/*.csv"))
-    synth_files = sorted(glob.glob("data/synthetic/*.csv"))
-
-    if synth_files and real_files:
-        real_f = st.selectbox("Real Benchmark Dataset", real_files, key="util_real")
-        synth_f = st.selectbox("Synthetic Dataset", synth_files, key="util_synth")
-        target_c = st.text_input("Target Column", value="income")
-
-        if st.button("Run TSTR vs TRTR Benchmark"):
-            df_r = load_csv(real_f)
-            df_s = load_csv(synth_f)
-
-            with st.spinner("Training Logistic Regression and Random Forest classifiers..."):
-                res = evaluate_downstream_utility(
-                    df_train_real=df_r,
-                    df_train_synth=df_s,
-                    df_test_real=df_r,
-                    target_column=target_c,
-                )
-
-            for clf_name, data in res.items():
-                st.subheader(f"Classifier: {clf_name.replace('_', ' ').title()}")
-                col1, col2, col3 = st.columns(3)
-                col1.metric("TRTR Macro F1", f"{data['trtr']['macro_f1']:.4f}")
-                col2.metric("TSTR Macro F1", f"{data['tstr']['macro_f1']:.4f}")
-                col3.metric("F1 Parity Ratio", f"{data['relative_utility_parity']:.4f}", delta=f"{data['minority_recall_delta']:+.4f} Min Recall")
+                    if os.path.exists(out_path):
+                        synth_df = pd.read_csv(out_path)
+                        st.dataframe(synth_df.head(10), use_container_width=True)
+                        csv_data = synth_df.to_csv(index=False).encode("utf-8")
+                        st.download_button(
+                            label="📥 Download Synthetic CSV",
+                            data=csv_data,
+                            file_name=os.path.basename(out_path),
+                            mime="text/csv",
+                        )
+                except Exception as exc:
+                    st.error(f"Generation failed: {exc}")
 
 
-# -----------------------------------------------------------------------------
-# 8. Empirical Privacy Audit
-# -----------------------------------------------------------------------------
-elif sidebar_nav == "Empirical Privacy Audit":
-    st.markdown("### Empirical Privacy & Memorization Audit")
-    st.write("Audits Distance-to-Closest-Record (DCR) ratios, NNDR, and Membership Inference Attack risk.")
+# =============================================================================
+# Page 5: Fidelity Dashboard
+# =============================================================================
+elif page == "Page 5: Fidelity Dashboard":
+    st.subheader("Statistical Fidelity Benchmark & Marginal Analysis")
 
-    real_files = sorted(glob.glob("data/raw/*.csv"))
-    synth_files = sorted(glob.glob("data/synthetic/*.csv"))
+    real_csvs = sorted(glob.glob("data/raw/*.csv"))
+    synth_csvs = sorted(glob.glob("data/synthetic/*.csv"))
 
-    if synth_files and real_files:
-        real_f = st.selectbox("Real Dataset", real_files, key="priv_real")
-        synth_f = st.selectbox("Synthetic Dataset", synth_files, key="priv_synth")
-
-        if st.button("Run Privacy Audit"):
-            df_r = load_csv(real_f)
-            df_s = load_csv(synth_f)
-            sch = infer_table_schema(df_r)
-
-            with st.spinner("Calculating Gower distances and shadow MIA..."):
-                res = evaluate_empirical_privacy(
-                    df_train=df_r,
-                    df_test=df_r,
-                    df_synth=df_s,
-                    continuous_cols=sch.continuous_columns,
-                    categorical_cols=sch.categorical_columns,
-                    subsample_size=500,
-                )
-
-            c1, c2, c3 = st.columns(3)
-            c1.metric("DCR Ratio (Train/Test)", f"{res['dcr_ratio']:.4f}")
-            c2.metric("Exact Training Matches", f"{res['exact_record_matches']}")
-            c3.metric("MIA AUROC", f"{res['membership_inference_auroc']:.4f}", help="0.50 represents ideal random guessing.")
-
-            st.success(f"Assessment: **{res['privacy_risk_assessment']}**")
-            st.caption(res["disclaimer"])
-
-
-# -----------------------------------------------------------------------------
-# 9. Experiment History & Export
-# -----------------------------------------------------------------------------
-elif sidebar_nav == "Experiment History & Export":
-    st.markdown("### Experiment History & CSV Export")
-    exp_files = sorted(glob.glob("experiments/results/*.json"))
-
-    if not exp_files:
-        st.info("No serialized experiment logs found in `experiments/results/`.")
+    if not real_csvs or not synth_csvs:
+        st.info("Requires at least one real dataset and one synthetic dataset.")
     else:
-        selected_exp = st.selectbox("Select Experiment Report", exp_files)
-        with open(selected_exp, "r") as f:
-            data = json.load(f)
-        st.json(data)
+        col_f1, col_f2 = st.columns(2)
+        with col_f1:
+            sel_real = st.selectbox("Ground Truth Real Dataset", real_csvs)
+        with col_f2:
+            sel_synth = st.selectbox("Generated Synthetic Dataset", synth_csvs)
+
+        if st.button("Compute Fidelity Metrics", type="primary"):
+            with st.spinner("Calculating Kolmogorov-Smirnov statistics, TVD, and C2ST..."):
+                try:
+                    if backend_online:
+                        results = api_client.evaluate_fidelity(sel_real, sel_synth)
+                    else:
+                        results = EvaluationService.evaluate_fidelity(sel_real, sel_synth)
+
+                    st.markdown("#### Fidelity Metric Scorecard")
+                    m1, m2, m3, m4 = st.columns(4)
+                    m1.metric("Mean KS Statistic ↓", f"{results['mean_kolmogorov_smirnov']:.4f}")
+                    m2.metric("Mean Total Variation ↓", f"{results['mean_total_variation_distance']:.4f}")
+                    m3.metric("Correlation Frobenius Dist ↓", f"{results['correlation_frobenius_distance']:.4f}")
+                    m4.metric("C2ST Accuracy (~0.50)", f"{results['c2st_accuracy']:.4f}")
+
+                    st.markdown("---")
+                    st.markdown("#### 1D Marginal Distribution Overlays")
+                    df_r = load_csv(sel_real)
+                    df_s = load_csv(sel_synth)
+                    common_cols = [c for c in df_r.columns if c in df_s.columns]
+                    col_to_plot = st.selectbox("Feature to Inspect", common_cols)
+
+                    if pd.api.types.is_numeric_dtype(df_r[col_to_plot]):
+                        fig = go.Figure()
+                        fig.add_trace(go.Histogram(x=df_r[col_to_plot], name="Real Data", opacity=0.6, histnorm="probability density"))
+                        fig.add_trace(go.Histogram(x=df_s[col_to_plot], name="Synthetic Data", opacity=0.6, histnorm="probability density"))
+                        fig.update_layout(barmode="overlay", title=f"Continuous Density: {col_to_plot}")
+                        st.plotly_chart(fig, use_container_width=True)
+                    else:
+                        pr = df_r[col_to_plot].value_counts(normalize=True).reset_index()
+                        pr.columns = ["cat", "real"]
+                        ps = df_s[col_to_plot].value_counts(normalize=True).reset_index()
+                        ps.columns = ["cat", "synthetic"]
+                        merged = pd.merge(pr, ps, on="cat", how="outer").fillna(0.0)
+                        fig = px.bar(merged, x="cat", y=["real", "synthetic"], barmode="group", title=f"Categorical Frequency: {col_to_plot}")
+                        st.plotly_chart(fig, use_container_width=True)
+
+                except Exception as exc:
+                    st.error(f"Fidelity evaluation failed: {exc}")
+
+
+# =============================================================================
+# Page 6: Utility Dashboard
+# =============================================================================
+elif page == "Page 6: Utility Dashboard":
+    st.subheader("Downstream Machine Learning Utility (TSTR vs TRTR)")
+    st.markdown("Evaluates whether machine learning models trained strictly on synthetic data generalize to real test partitions.")
+
+    real_csvs = sorted(glob.glob("data/raw/*.csv"))
+    synth_csvs = sorted(glob.glob("data/synthetic/*.csv"))
+
+    if real_csvs and synth_csvs:
+        col_u1, col_u2, col_u3 = st.columns(3)
+        with col_u1:
+            u_real = st.selectbox("Real Benchmark Dataset", real_csvs, key="u_real")
+        with col_u2:
+            u_synth = st.selectbox("Synthetic Training Dataset", synth_csvs, key="u_synth")
+        with col_u3:
+            df_temp = load_csv(u_real)
+            cand_targets = [c for c in df_temp.columns if df_temp[c].nunique() <= 10]
+            u_target = st.selectbox("Target Classification Variable", cand_targets)
+
+        if st.button("Run TSTR Benchmark Battery", type="primary"):
+            with st.spinner("Training downstream LogisticRegression and RandomForest classifiers..."):
+                try:
+                    if backend_online:
+                        results = api_client.evaluate_utility(u_real, u_synth, u_real, u_target)
+                    else:
+                        results = EvaluationService.evaluate_utility(u_real, u_synth, u_real, u_target)
+
+                    for clf, metrics in results.items():
+                        st.markdown(f"### Classifier: **{clf.replace('_', ' ').title()}**")
+                        c1, c2, c3, c4 = st.columns(4)
+                        c1.metric("TRTR Macro-F1", f"{metrics['trtr']['macro_f1']:.4f}")
+                        c2.metric("TSTR Macro-F1", f"{metrics['tstr']['macro_f1']:.4f}")
+                        c3.metric("F1 Parity Ratio", f"{metrics['relative_utility_parity']:.4f}")
+                        c4.metric("Minority Recall Delta", f"{metrics['minority_recall_delta']:+.4f}")
+                        st.markdown("---")
+                except Exception as exc:
+                    st.error(f"Utility evaluation failed: {exc}")
+
+
+# =============================================================================
+# Page 7: Privacy Audit
+# =============================================================================
+elif page == "Page 7: Privacy Audit":
+    st.subheader("Empirical Privacy & Training Set Memorization Audit")
+
+    real_csvs = sorted(glob.glob("data/raw/*.csv"))
+    synth_csvs = sorted(glob.glob("data/synthetic/*.csv"))
+
+    if real_csvs and synth_csvs:
+        col_p1, col_p2 = st.columns(2)
+        with col_p1:
+            p_real = st.selectbox("Real Benchmark Dataset", real_csvs, key="p_real")
+        with col_p2:
+            p_synth = st.selectbox("Synthetic Evaluation Dataset", synth_csvs, key="p_synth")
+
+        subsample = st.slider("Privacy Subsample Size (Speed vs Precision)", min_value=100, max_value=1000, value=300, step=100)
+
+        if st.button("Execute Privacy Audit", type="primary"):
+            with st.spinner("Computing Distance-to-Closest-Record and shadow MIA..."):
+                try:
+                    if backend_online:
+                        res = api_client.evaluate_privacy(p_real, p_real, p_synth, subsample=subsample)
+                    else:
+                        res = EvaluationService.evaluate_privacy(p_real, p_real, p_synth, subsample_size=subsample)
+
+                    c1, c2, c3 = st.columns(3)
+                    c1.metric("DCR Ratio (Train/Test)", f"{res['dcr_ratio']:.4f}", help="Values near 1.0 indicate identical distance distributions.")
+                    c2.metric("Exact Training Matches", f"{res['exact_record_matches']}", help="0 exact matches means zero verbatim record memorization.")
+                    c3.metric("MIA AUROC", f"{res['membership_inference_auroc']:.4f}", help="0.50 denotes ideal random guessing.")
+
+                    st.success(f"Empirical Risk Assessment: **{res['privacy_risk_assessment']}**")
+
+                    # Prominent Privacy Disclaimer Alert
+                    st.warning("""
+                    **⚠️ Research Privacy Disclaimer:**
+                    Empirical metrics (DCR, exact matches, shadow MIA) measure privacy under observed test distributions.
+                    They do **NOT** provide mathematically provable Differential Privacy ($\\epsilon, \\delta$-DP).
+                    For regulated deployments (HIPAA/GDPR), combine with DP-SGD noise mechanisms.
+                    """)
+                except Exception as exc:
+                    st.error(f"Privacy audit failed: {exc}")
+
+
+# =============================================================================
+# Page 8: Experiment Explorer
+# =============================================================================
+elif page == "Page 8: Experiment Explorer":
+    st.subheader("Experiment Registry & Historical Metrics Explorer")
+
+    exps = ExperimentService.list_experiments()
+
+    if not exps:
+        st.info("No recorded experiments found. Run evaluations or benchmark runners to populate.")
+    else:
+        exp_labels = {f"{e.get('name', 'Exp')} ({e['id']})": e['id'] for e in exps}
+        sel_exp_label = st.selectbox("Select Experiment", list(exp_labels.keys()))
+        sel_id = exp_labels[sel_exp_label]
+
+        details = ExperimentService.get_experiment(sel_id)
+        st.markdown(f"#### Experiment: `{details.get('name', sel_id)}`")
+        if details.get("description"):
+            st.caption(details["description"])
+
+        metrics_data = details.get("metrics", {})
+        if metrics_data:
+            st.json(metrics_data)

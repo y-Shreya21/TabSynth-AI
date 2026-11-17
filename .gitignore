@@ -58,6 +58,9 @@ datasets/
 synthetic_data/
 generated_data/
 outputs/private/
+*.db
+*.sqlite
+*.sqlite3
 
 # Model Checkpoints & Serialized Artifacts
 checkpoints/*

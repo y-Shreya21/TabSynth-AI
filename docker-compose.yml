@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  # FastAPI REST Backend Service
   api:
     build:
       context: .
@@ -10,31 +11,40 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - PYTHONUNBUFFERED=1
-      - TABSYNTH_ENV=production
+      - TABSYNTH_DATA_DIR=/app/data
+      - TABSYNTH_CHECKPOINT_DIR=/app/checkpoints
+      - TABSYNTH_EXPERIMENT_DIR=/app/experiments/results
+      - TABSYNTH_DB_PATH=/app/data/tabsynth.db
+      - TABSYNTH_DEVICE=cpu
+      - MAX_CONCURRENT_JOBS=1
     volumes:
       - ./data:/app/data
       - ./checkpoints:/app/checkpoints
       - ./experiments/results:/app/experiments/results
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
+      interval: 15s
       timeout: 5s
       retries: 3
       start_period: 10s
-    command: ["uvicorn", "api.server:app", "--host", "0.0.0.0", "--port", "8000"]
 
+  # Streamlit Interactive Analytics Dashboard
   dashboard:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: tabsynth-dashboard
     restart: unless-stopped
+    command: ["streamlit", "run", "app/main.py", "--server.port=8501", "--server.address=0.0.0.0"]
     ports:
       - "8501:8501"
     environment:
-      - PYTHONUNBUFFERED=1
       - TABSYNTH_API_URL=http://api:8000
+      - TABSYNTH_DATA_DIR=/app/data
+      - TABSYNTH_CHECKPOINT_DIR=/app/checkpoints
+      - TABSYNTH_EXPERIMENT_DIR=/app/experiments/results
+      - TABSYNTH_DB_PATH=/app/data/tabsynth.db
+      - TABSYNTH_DEVICE=cpu
     volumes:
       - ./data:/app/data
       - ./checkpoints:/app/checkpoints
@@ -42,4 +52,3 @@ services:
     depends_on:
       api:
         condition: service_healthy
-    command: ["streamlit", "run", "app/main.py", "--server.port=8501", "--server.address=0.0.0.0"]

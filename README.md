@@ -3,7 +3,7 @@
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
 [![PyTorch 2.2+](https://img.shields.io/badge/pytorch-2.2+-ee4c2c.svg)](https://pytorch.org/)
 [![Hardware: Apple Silicon MPS](https://img.shields.io/badge/hardware-Apple%20Silicon%20M4%20(MPS)-silver.svg)](https://developer.apple.com/metal/pytorch/)
-[![Tests: 103 Passed](https://img.shields.io/badge/tests-103%20passed-brightgreen.svg)](tests/)
+[![Tests: 120 Passed](https://img.shields.io/badge/tests-120%20passed-brightgreen.svg)](tests/)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 
 > **Hybrid Transformer-MLP Diffusion Framework for Privacy-Aware, High-Fidelity and Class-Conditional Synthetic Tabular Data Generation.**
@@ -176,27 +176,43 @@ python scripts/generate_phase05_report.py
 
 ### 6. Interactive Dashboard & REST API
 ```bash
-# Launch Streamlit interactive dashboard
-streamlit run app/main.py
+# Launch FastAPI REST API with automatic reload (Port 8000)
+make run-api
+# Interactive Swagger Documentation: http://localhost:8000/docs
 
-# Launch FastAPI REST API documentation
-uvicorn api.server:app --host 0.0.0.0 --port 8000
-# Open Swagger UI at: http://localhost:8000/docs
+# Launch Streamlit TabSynth Analytics SaaS Dashboard (Port 8501)
+make run-app
+# Dashboard URL: http://localhost:8501
+
+# Run Phase 06 End-to-End Application Smoke Test (< 4s)
+python scripts/run_phase06_smoke.py
+```
+
+### 7. Containerized Deployment (Docker Compose)
+```bash
+# Build multi-service production container
+docker compose build
+
+# Launch FastAPI and Streamlit services in background
+docker compose up -d
+
+# Verify service health
+curl -f http://localhost:8000/health
 ```
 
 ---
 
 ## 🧪 Testing & Verification
 
-The test suite validates data loading, diffusion mathematics, model forward passes, checkpointing, reverse generation, fidelity, utility, and privacy metrics:
+The comprehensive test suite validates data loading, diffusion mathematics, model forward passes, checkpointing, reverse generation, fidelity, utility, privacy metrics, background jobs, database repositories, and security controls:
 
 ```bash
-# Run full pytest suite (103 tests)
+# Run full pytest suite (120 tests)
 pytest tests/ -v
 ```
 
 ```text
-============================== 103 passed in 18.57s ==============================
+============================== 120 passed in 17.56s ==============================
 ```
 
 - **Diffusion Engine Tests (`tests/diffusion/`):** 25 passed.
@@ -206,7 +222,11 @@ pytest tests/ -v
 - **Statistical Fidelity Tests (`tests/evaluation/`):** 10 passed.
 - **Privacy Auditing Tests (`tests/privacy/`):** 6 passed.
 - **Baseline Registry Tests (`tests/benchmarks/`):** 4 passed.
-- **Integration & Unit Tests (`tests/integration/`, `tests/unit/`):** 23 passed.
+- **SQLite Database Repositories (`tests/unit/test_db_repositories.py`):** 4 passed.
+- **Background Job Manager (`tests/unit/test_job_service.py`):** 3 passed.
+- **Security & Upload Validation (`tests/unit/test_security_controls.py`):** 5 passed.
+- **API Services & Endpoints (`tests/integration/`):** 9 passed.
+- **Preprocessors & Core Unit Tests (`tests/unit/`):** 19 passed.
 
 ---
 

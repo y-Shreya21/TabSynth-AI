@@ -54,27 +54,37 @@ class TabDDPMMLPModel(nn.Module):
 
     def forward(
         self,
-        x_num_t: Optional[torch.Tensor],
-        x_cat_t_list: Optional[List[torch.Tensor]],
-        t: torch.Tensor,
+        x_num_t: Optional[torch.Tensor] = None,
+        x_cat_t_list: Optional[List[torch.Tensor]] = None,
+        t: Optional[torch.Tensor] = None,
         c: Optional[torch.Tensor] = None,
         force_uncond: bool = False,
+        # Unified aliases matching TabSynthHybridModel
+        x_cat_t: Optional[List[torch.Tensor]] = None,
+        timesteps_num: Optional[torch.Tensor] = None,
+        timesteps_cat: Optional[torch.Tensor] = None,
+        class_labels: Optional[torch.Tensor] = None,
+        **kwargs,
     ) -> Tuple[torch.Tensor, List[torch.Tensor]]:
         """Directly concatenates raw inputs into the MLP denoiser."""
-        batch_size = t.shape[0]
+        cat_input = x_cat_t_list if x_cat_t_list is not None else x_cat_t
+        t_in = t if t is not None else (timesteps_num if timesteps_num is not None else timesteps_cat)
+        c_in = c if c is not None else class_labels
+
+        batch_size = t_in.shape[0] if t_in is not None else (x_num_t.shape[0] if x_num_t is not None else cat_input[0].shape[0])
 
         # Concatenate continuous features and one-hot categorical vectors
         inputs = []
         if self.num_continuous > 0 and x_num_t is not None:
             inputs.append(x_num_t)
-        if len(self.cardinalities) > 0 and x_cat_t_list is not None:
-            inputs.extend(x_cat_t_list)
+        if len(self.cardinalities) > 0 and cat_input is not None:
+            inputs.extend(cat_input)
 
         raw_flat = torch.cat(inputs, dim=-1)
 
         # Fuse conditioning
-        time_emb = self.time_embedding(t)
-        class_emb = self.class_embedding(c, batch_size=batch_size, force_uncond=force_uncond)
+        time_emb = self.time_embedding(t_in)
+        class_emb = self.class_embedding(c_in, batch_size=batch_size, force_uncond=force_uncond)
         e_cond = time_emb + class_emb
 
         pred_eps, pred_cat_logits = self.denoiser(h_flat=raw_flat, cond=e_cond)
