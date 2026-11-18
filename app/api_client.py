@@ -109,5 +109,10 @@ class TabSynthAPIClient:
         r.raise_for_status()
         return r.json().get("experiments", [])
 
+    def get_experiment(self, experiment_id: str) -> Dict[str, Any]:
+        r = requests.get(f"{self.base_url}/api/v1/experiments/{experiment_id}", timeout=self.timeout)
+        r.raise_for_status()
+        return r.json()
+
 
 client = TabSynthAPIClient()

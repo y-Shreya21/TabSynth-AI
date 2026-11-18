@@ -1,0 +1,43 @@
+# TabSynth Analytics Theme Configuration
+# Dark mode SaaS design system inspired by Linear, Vercel, and Databricks
+
+[theme]
+base = "dark"
+primaryColor = "#8B5CF6"
+backgroundColor = "#0B0F19"
+secondaryBackgroundColor = "#161E2E"
+textColor = "#F8FAFC"
+borderColor = "#273449"
+
+font = "'Inter':https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "'Inter':https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap"
+codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+
+baseFontSize = 14
+baseFontWeight = 400
+codeFontSize = "13px"
+headingFontSizes = ["28px", "22px", "18px", "16px", "14px", "12px"]
+headingFontWeights = [700, 600, 600, 600, 500, 500]
+
+showWidgetBorder = true
+showSidebarBorder = true
+baseRadius = "8px"
+buttonRadius = "8px"
+linkUnderline = false
+paddingTop = "0.75rem"
+paddingBottom = "2.5rem"
+
+[theme.sidebar]
+backgroundColor = "#111827"
+secondaryBackgroundColor = "#161E2E"
+textColor = "#F8FAFC"
+borderColor = "#273449"
+paddingTop = "0.75rem"
+paddingBottom = "1.5rem"
+
+[server]
+headless = true
+enableStaticServing = false
+
+[browser]
+gatherUsageStats = false

@@ -10,7 +10,9 @@ from api.schemas.datasets import (
     DatasetDetailResponse,
     DatasetListResponse,
 )
+from api.config import settings
 from api.services.dataset_service import DatasetService
+from api.utils.security import validate_safe_path, validate_csv_upload
 from tabsynth.data.schema import infer_table_schema
 
 router = APIRouter(prefix="/datasets", tags=["Datasets"])
@@ -23,10 +25,12 @@ async def upload_dataset(
     target_column: Optional[str] = Form(None),
 ):
     """Upload a tabular CSV dataset with schema validation and profiling."""
+    filename = file.filename or "dataset.csv"
     content = await file.read()
+    validate_csv_upload(filename, content, max_size_bytes=settings.max_upload_size_bytes)
     record = DatasetService.upload_dataset(
         file_bytes=content,
-        filename=file.filename or "dataset.csv",
+        filename=filename,
         name=name,
         target_column=target_column,
     )
@@ -71,12 +75,17 @@ async def get_dataset_schema_compat(
     target_column: Optional[str] = "income",
 ):
     """Retrieve schema directly from filesystem path (backward compatible)."""
-    if not os.path.exists(data_path):
+    safe_data_path = validate_safe_path(
+        data_path,
+        allowed_roots=settings.get_allowed_storage_roots(),
+        error_message=f"Access denied: Path '{data_path}' is outside authorized data storage directories.",
+    )
+    if not os.path.exists(safe_data_path):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Dataset not found at {data_path}",
         )
-    df = pd.read_csv(data_path)
+    df = pd.read_csv(safe_data_path)
     schema = infer_table_schema(df, target_column=target_column)
     return TableSchemaResponse(
         dataset_name=schema.dataset_name,

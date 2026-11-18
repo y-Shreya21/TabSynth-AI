@@ -1,29 +1,45 @@
-# Git
+# Git & SCM
 .git/
 .gitignore
+.github/
 
-# Python Bytecode and Caches
+# Python Bytecode, Caches & Environments
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
 *.egg-info/
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Virtual Environments
 .venv/
 venv/
 env/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
 
-# Data & Datasets (Privacy & Size Safeguards)
+# Agent & IDE Configurations
+.agents/
+.claude/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Data, SQLite & Artifact Volumes (Prevent baking user/test state into images)
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+data/*.db-wal
+data/*.db-shm
 data/raw/*
 !data/raw/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
 data/synthetic/*
 !data/synthetic/.gitkeep
-
-# Checkpoints and Artifacts
 checkpoints/*
 !checkpoints/.gitkeep
 artifacts/
@@ -33,22 +49,20 @@ artifacts/
 *.safetensors
 *.onnx
 
-# Experiment Logs & Runs
+# Experiment Results & Backups
 experiments/logs/*
 !experiments/logs/.gitkeep
 experiments/results/*
 !experiments/results/.gitkeep
+backups/
 mlruns/
 .mlflow/
 
-# Environment Variables & Secrets
+# Secrets & Environment Files
 .env
 .env.*
 !.env.example
 *.pem
 *.key
-
-# IDE & OS
-.vscode/
-.idea/
-.DS_Store
+*.cert
+*.crt

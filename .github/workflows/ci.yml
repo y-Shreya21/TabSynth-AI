@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Unit & Integration Tests (Python 3.11)
+    name: Unit, Integration & Smoke Benchmarks (Python 3.11)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -29,10 +29,45 @@ jobs:
         run: |
           python -m py_compile $(find src scripts api app tests -name "*.py")
 
-      - name: Run Smoke Benchmark
+      - name: Configuration & Sanity Check
+        run: |
+          python -c "from api.config import settings; settings.validate_production_config(); print('Config Validated')"
+
+      - name: Run Phase 05 Evaluation Smoke Test
         run: |
           python scripts/run_phase05_smoke.py
 
-      - name: Run Test Suite
+      - name: Run Phase 06 Application Smoke Test
+        run: |
+          python scripts/run_phase06_smoke.py
+
+      - name: Run Phase 07 Production Hardening Smoke Test
+        run: |
+          python scripts/run_phase07_smoke.py
+
+      - name: Run Full Pytest Test Suite
         run: |
           pytest tests/ -v --cov=tabsynth --cov-report=term-missing
+
+  docker-build:
+    name: Multi-Stage Docker Build Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Production Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: tabsynth-ai:test
+          load: true
+
+      - name: Verify Container Image Integrity
+        run: |
+          docker run --rm tabsynth-ai:test python -c "import tabsynth; import api; print('Container runtime verified successfully!')"

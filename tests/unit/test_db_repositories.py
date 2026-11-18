@@ -127,14 +127,25 @@ def test_experiment_and_artifact_repositories():
     assert fetched_exp is not None
     assert fetched_exp.metrics["ks_mean"] == 0.05
 
+    # Ensure parent job exists to satisfy foreign key constraint
+    job_id = f"test_job_{uuid.uuid4().hex[:6]}"
+    JobRepository.create(
+        JobRecord(
+            id=job_id,
+            job_type="synthesis",
+            status="completed",
+            progress=1.0,
+        )
+    )
+
     art_id = f"test_art_{uuid.uuid4().hex[:8]}"
     art_record = ArtifactRecord(
         id=art_id,
-        job_id="test_job_123",
+        job_id=job_id,
         artifact_type="synthetic_csv",
         file_path="data/synthetic/test.csv",
     )
     ArtifactRepository.create(art_record)
 
-    artifacts = ArtifactRepository.list_by_job_id("test_job_123")
+    artifacts = ArtifactRepository.list_by_job_id(job_id)
     assert any(a.id == art_id for a in artifacts)

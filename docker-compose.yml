@@ -1,26 +1,36 @@
 version: "3.8"
 
 services:
+  # ----------------------------------------------------------------------------
   # FastAPI REST Backend Service
+  # ----------------------------------------------------------------------------
   api:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runtime
     container_name: tabsynth-api
     restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
+      - TABSYNTH_ENV=production
+      - LOG_LEVEL=INFO
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
       - TABSYNTH_DATA_DIR=/app/data
       - TABSYNTH_CHECKPOINT_DIR=/app/checkpoints
       - TABSYNTH_EXPERIMENT_DIR=/app/experiments/results
+      - TABSYNTH_BACKUP_DIR=/app/backups
       - TABSYNTH_DB_PATH=/app/data/tabsynth.db
       - TABSYNTH_DEVICE=cpu
-      - MAX_CONCURRENT_JOBS=1
+      - MAX_CONCURRENT_JOBS=2
+      - CORS_ORIGINS=http://localhost:8501,http://127.0.0.1:8501
     volumes:
-      - ./data:/app/data
-      - ./checkpoints:/app/checkpoints
-      - ./experiments/results:/app/experiments/results
+      - tabsynth_data:/app/data
+      - tabsynth_checkpoints:/app/checkpoints
+      - tabsynth_experiments:/app/experiments/results
+      - tabsynth_backups:/app/backups
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 15s
@@ -28,17 +38,21 @@ services:
       retries: 3
       start_period: 10s
 
+  # ----------------------------------------------------------------------------
   # Streamlit Interactive Analytics Dashboard
+  # ----------------------------------------------------------------------------
   dashboard:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runtime
     container_name: tabsynth-dashboard
     restart: unless-stopped
-    command: ["streamlit", "run", "app/main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    command: ["streamlit", "run", "app/main.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.headless=true"]
     ports:
       - "8501:8501"
     environment:
+      - TABSYNTH_ENV=production
       - TABSYNTH_API_URL=http://api:8000
       - TABSYNTH_DATA_DIR=/app/data
       - TABSYNTH_CHECKPOINT_DIR=/app/checkpoints
@@ -46,9 +60,28 @@ services:
       - TABSYNTH_DB_PATH=/app/data/tabsynth.db
       - TABSYNTH_DEVICE=cpu
     volumes:
-      - ./data:/app/data
-      - ./checkpoints:/app/checkpoints
-      - ./experiments/results:/app/experiments/results
+      - tabsynth_data:/app/data
+      - tabsynth_checkpoints:/app/checkpoints
+      - tabsynth_experiments:/app/experiments/results
     depends_on:
       api:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+# ------------------------------------------------------------------------------
+# Persistent Volume Declarations
+# ------------------------------------------------------------------------------
+volumes:
+  tabsynth_data:
+    name: tabsynth_data
+  tabsynth_checkpoints:
+    name: tabsynth_checkpoints
+  tabsynth_experiments:
+    name: tabsynth_experiments
+  tabsynth_backups:
+    name: tabsynth_backups

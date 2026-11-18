@@ -99,6 +99,18 @@ class CheckpointManager:
         if not os.path.exists(checkpoint_path):
             raise FileNotFoundError(f"Checkpoint not found at: {checkpoint_path}")
 
+        # Block null bytes in path
+        if "\x00" in str(checkpoint_path):
+            raise ValueError(f"Invalid characters in checkpoint path: {checkpoint_path}")
+
+        # Whitelist trusted TabularPreprocessor class if PyTorch safe globals are available
+        try:
+            import torch.serialization
+            if hasattr(torch.serialization, "add_safe_globals"):
+                torch.serialization.add_safe_globals([TabularPreprocessor])
+        except Exception:
+            pass
+
         target_device = torch.device(device) if isinstance(device, str) else device
         checkpoint = torch.load(checkpoint_path, map_location=target_device, weights_only=False)
 

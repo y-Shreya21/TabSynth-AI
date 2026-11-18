@@ -6,8 +6,10 @@ import logging
 import pandas as pd
 from typing import Dict, Any, Optional
 from fastapi import HTTPException, status
+from api.config import settings
 from api.db.models import ExperimentRecord
 from api.db.repositories import ExperimentRepository
+from api.utils.security import validate_safe_path
 from tabsynth.data.schema import infer_table_schema
 from tabsynth.evaluation.fidelity import evaluate_statistical_fidelity
 from tabsynth.evaluation.utility import evaluate_downstream_utility
@@ -26,19 +28,23 @@ class EvaluationService:
         target_column: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Compute marginal distributions, correlation distances, and C2ST indistinguishability."""
-        if not os.path.exists(real_data_path):
+        allowed_roots = settings.get_allowed_storage_roots()
+        safe_real = validate_safe_path(real_data_path, allowed_roots)
+        safe_synth = validate_safe_path(synthetic_data_path, allowed_roots)
+
+        if not os.path.exists(safe_real):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Real data path '{real_data_path}' was not found.",
             )
-        if not os.path.exists(synthetic_data_path):
+        if not os.path.exists(safe_synth):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Synthetic data path '{synthetic_data_path}' was not found.",
             )
 
-        df_real = pd.read_csv(real_data_path)
-        df_synth = pd.read_csv(synthetic_data_path)
+        df_real = pd.read_csv(safe_real)
+        df_synth = pd.read_csv(safe_synth)
         schema = infer_table_schema(df_real, target_column=target_column)
 
         results = evaluate_statistical_fidelity(
@@ -68,16 +74,25 @@ class EvaluationService:
         target_column: str,
     ) -> Dict[str, Any]:
         """Compute TSTR vs TRTR downstream classification metrics."""
-        for path in [real_train_path, synthetic_train_path, real_test_path]:
-            if not os.path.exists(path):
+        allowed_roots = settings.get_allowed_storage_roots()
+        safe_train_real = validate_safe_path(real_train_path, allowed_roots)
+        safe_train_synth = validate_safe_path(synthetic_train_path, allowed_roots)
+        safe_test_real = validate_safe_path(real_test_path, allowed_roots)
+
+        for p_orig, p_safe in [
+            (real_train_path, safe_train_real),
+            (synthetic_train_path, safe_train_synth),
+            (real_test_path, safe_test_real),
+        ]:
+            if not os.path.exists(p_safe):
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Required dataset file '{path}' was not found.",
+                    detail=f"Required dataset file '{p_orig}' was not found.",
                 )
 
-        df_train_real = pd.read_csv(real_train_path)
-        df_train_synth = pd.read_csv(synthetic_train_path)
-        df_test_real = pd.read_csv(real_test_path)
+        df_train_real = pd.read_csv(safe_train_real)
+        df_train_synth = pd.read_csv(safe_train_synth)
+        df_test_real = pd.read_csv(safe_test_real)
 
         results = evaluate_downstream_utility(
             df_train_real=df_train_real,
@@ -105,16 +120,25 @@ class EvaluationService:
         subsample_size: int = 1000,
     ) -> Dict[str, Any]:
         """Compute empirical Distance-to-Closest-Record, exact matches, and shadow MIA."""
-        for path in [real_train_path, real_test_path, synthetic_path]:
-            if not os.path.exists(path):
+        allowed_roots = settings.get_allowed_storage_roots()
+        safe_train = validate_safe_path(real_train_path, allowed_roots)
+        safe_test = validate_safe_path(real_test_path, allowed_roots)
+        safe_synth = validate_safe_path(synthetic_path, allowed_roots)
+
+        for p_orig, p_safe in [
+            (real_train_path, safe_train),
+            (real_test_path, safe_test),
+            (synthetic_path, safe_synth),
+        ]:
+            if not os.path.exists(p_safe):
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Required dataset file '{path}' was not found.",
+                    detail=f"Required dataset file '{p_orig}' was not found.",
                 )
 
-        df_train = pd.read_csv(real_train_path)
-        df_test = pd.read_csv(real_test_path)
-        df_synth = pd.read_csv(synthetic_path)
+        df_train = pd.read_csv(safe_train)
+        df_test = pd.read_csv(safe_test)
+        df_synth = pd.read_csv(safe_synth)
         schema = infer_table_schema(df_train)
 
         results = evaluate_empirical_privacy(

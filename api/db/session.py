@@ -72,14 +72,41 @@ CREATE TABLE IF NOT EXISTS artifacts (
 """
 
 
+def recover_orphaned_jobs(db_path: str = settings.db_path) -> int:
+    """Detects and fails jobs left in 'running' or 'queued' state across server restarts."""
+    if not os.path.exists(db_path):
+        return 0
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM jobs WHERE status IN ('running', 'queued');")
+        stale_jobs = cursor.fetchall()
+        if stale_jobs:
+            stale_ids = [row[0] for row in stale_jobs]
+            cursor.execute(
+                """
+                UPDATE jobs
+                SET status = 'failed',
+                    error = 'Server restarted or terminated while job was in progress.',
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE status IN ('running', 'queued');
+                """
+            )
+            conn.commit()
+            return len(stale_ids)
+    return 0
+
+
 def init_db(db_path: str = settings.db_path) -> None:
-    """Initialize SQLite tables and apply Pragmas."""
+    """Initialize SQLite tables, apply concurrency Pragmas, and recover stale jobs."""
     os.makedirs(os.path.dirname(db_path) or ".", exist_ok=True)
     with sqlite3.connect(db_path) as conn:
         conn.execute("PRAGMA journal_mode=WAL;")
         conn.execute("PRAGMA foreign_keys=ON;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
+        conn.execute("PRAGMA busy_timeout=30000;")
         conn.executescript(SCHEMA_SQL)
         conn.commit()
+    recover_orphaned_jobs(db_path)
 
 
 @contextmanager
@@ -87,6 +114,8 @@ def get_db_connection(db_path: str = settings.db_path) -> Generator[sqlite3.Conn
     """Context manager providing a thread-safe connection with dictionary row access."""
     conn = sqlite3.connect(db_path, check_same_thread=False, timeout=30.0)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys=ON;")
+    conn.execute("PRAGMA busy_timeout=30000;")
     try:
         yield conn
         conn.commit()
