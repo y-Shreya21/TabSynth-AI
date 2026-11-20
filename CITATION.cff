@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use TabSynth AI in your research or application, please cite it using the metadata below."
+authors:
+  - family-names: "Yadav"
+    given-names: "Shreya"
+title: "TabSynth AI: Hybrid Transformer-MLP Diffusion Framework for Privacy-Aware, High-Fidelity and Class-Conditional Synthetic Tabular Data Generation"
+version: "0.9.0-rc.1"
+date-released: "2026-11-18"
+url: "https://github.com/y-Shreya21/TabSynth-AI"
+repository-code: "https://github.com/y-Shreya21/TabSynth-AI"
+license: "Apache-2.0"
+keywords:
+  - "tabular diffusion"
+  - "synthetic data generation"
+  - "hybrid transformer-mlp"
+  - "classifier-free guidance"
+  - "d3pm multinomial diffusion"
+  - "privacy auditing"
+  - "distance to closest record"
+  - "membership inference attack"

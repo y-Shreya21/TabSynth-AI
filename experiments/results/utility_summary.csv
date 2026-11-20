@@ -1,0 +1,13 @@
+Model,Classifier,TSTR_Macro_F1,TRTR_Macro_F1_Ref,F1_Parity_Ratio,Minority_Recall,AUROC
+Gaussian_Copula,logistic_regression,0.4607,0.7812,0.5897,0.0536,0.5188
+Gaussian_Copula,random_forest,0.4316,0.7788,0.5541,0.0,0.6085
+Gaussian_Copula,hist_gradient_boosting,0.4842,0.8088,0.5986,0.0884,0.5973
+TVAE,logistic_regression,0.7443,0.7812,0.9527,0.6318,0.8676
+TVAE,random_forest,0.6431,0.7788,0.8258,0.267,0.8646
+TVAE,hist_gradient_boosting,0.6255,0.8088,0.7733,0.2279,0.8523
+TabDDPM_MLP,logistic_regression,0.5412,0.7812,0.6928,0.1709,0.6027
+TabDDPM_MLP,random_forest,0.4696,0.7788,0.6029,0.0442,0.6308
+TabDDPM_MLP,hist_gradient_boosting,0.6069,0.8088,0.7503,0.3248,0.691
+TabSynth_Hybrid,logistic_regression,0.4727,0.7812,0.6051,0.5323,0.5325
+TabSynth_Hybrid,random_forest,0.46,0.7788,0.5906,0.0298,0.5484
+TabSynth_Hybrid,hist_gradient_boosting,0.4967,0.8088,0.6141,0.1122,0.5799

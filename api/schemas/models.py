@@ -5,20 +5,20 @@ from pydantic import BaseModel, Field
 
 
 class TrainHyperparameters(BaseModel):
-    d_model: int = 64
-    transformer_layers: int = 2
-    attention_heads: int = 4
-    mlp_hidden_dim: int = 256
-    mlp_layers: int = 3
-    dropout: float = 0.1
-    diffusion_steps: int = 100
+    d_model: int = Field(default=64, gt=0)
+    transformer_layers: int = Field(default=2, ge=0)
+    attention_heads: int = Field(default=4, gt=0)
+    mlp_hidden_dim: int = Field(default=256, gt=0)
+    mlp_layers: int = Field(default=3, gt=0)
+    dropout: float = Field(default=0.1, ge=0.0, le=1.0)
+    diffusion_steps: int = Field(default=100, gt=0)
     noise_schedule: str = "cosine"
-    batch_size: int = 256
-    learning_rate: float = 2e-4
-    epochs: int = 30
-    lambda_num: float = 1.0
-    lambda_cat: float = 0.2
-    lambda_aux: float = 0.1
+    batch_size: int = Field(default=256, gt=0)
+    learning_rate: float = Field(default=2e-4, gt=0.0)
+    epochs: int = Field(default=30, gt=0)
+    lambda_num: float = Field(default=1.0, ge=0.0)
+    lambda_cat: float = Field(default=0.2, ge=0.0)
+    lambda_aux: float = Field(default=0.1, ge=0.0)
     seed: int = 42
 
 

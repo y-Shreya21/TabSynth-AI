@@ -1,0 +1,52 @@
+# Figure 7: Tri-Dimensional Evaluation & Privacy Auditing Pipeline
+
+```mermaid
+flowchart TD
+    subgraph Partitions["1. Data Partitions (Zero-Leakage Protocol)"]
+        D_train["Training Partition D_train (70%)"]
+        D_test["Unseen Test Partition D_test (15%)"]
+        D_synth["Synthetic Records S = G_theta(z)"]
+    end
+
+    subgraph Fidelity["2. Statistical Fidelity Evaluation"]
+        D_train --> KS["Kolmogorov-Smirnov (KS) Test (Continuous 1D Marginals)"]
+        D_synth --> KS
+        D_train --> Wass["1-Wasserstein Distance (Earth Mover's Distance)"]
+        D_synth --> Wass
+        D_train --> TVD["Total Variation Distance (TVD) (Categorical Simplex)"]
+        D_synth --> TVD
+        D_train --> Frob["Pearson & Spearman Correlation Frobenius Norm Distance"]
+        D_synth --> Frob
+        D_train --> Theil["Theil's U & Cramer's V Categorical Association Distance"]
+        D_synth --> Theil
+        D_train --> C2ST["Classifier Two-Sample Test (C2ST) ROC-AUC (Optimal ~ 0.50)"]
+        D_synth --> C2ST
+    end
+
+    subgraph Utility["3. Downstream Machine Learning Utility (TSTR vs TRTR)"]
+        D_synth --> TrainTSTR["Train Classifiers on S (TSTR): Random Forest, HistGB, LogReg"]
+        D_train --> TrainTRTR["Train Classifiers on D_train (TRTR Reference Baseline)"]
+        D_test --> EvalTSTR["Evaluate TSTR Models on Real Test Data D_test"]
+        TrainTSTR --> EvalTSTR
+        D_test --> EvalTRTR["Evaluate TRTR Models on Real Test Data D_test"]
+        TrainTRTR --> EvalTRTR
+        EvalTSTR --> ParityRatio["Compute Relative Macro-F1 Parity: F1_TSTR / F1_TRTR"]
+        EvalTRTR --> ParityRatio
+        EvalTSTR --> MinorityRecall["Evaluate Minority Class Recall Gain & Augmentation Ratios"]
+    end
+
+    subgraph Privacy["4. Empirical Privacy Auditing & Memorization Risk"]
+        D_synth --> GowerMatrix["Compute Normalized Gower Distance Matrix"]
+        D_train --> GowerMatrix
+        D_test --> GowerMatrix
+        GowerMatrix --> DCR["Distance to Closest Record (DCR) to Train vs Test"]
+        DCR --> DCRRatio["DCR Ratio: DCR_train / DCR_test (Target >= 1.0)"]
+        GowerMatrix --> NNDR["Nearest Neighbor Distance Ratio (NNDR) & < 0.5 Fraction"]
+        GowerMatrix --> ExactMatch["Exact Record Duplication Counter (Target = 0)"]
+        GowerMatrix --> ShadowMIA["Distance-Based Shadow Membership Inference Attack (MIA) ROC-AUC"]
+        DCRRatio --> PrivacyRisk["Consolidated Risk Rating: LOW_RISK / MODERATE / HIGH"]
+        NNDR --> PrivacyRisk
+        ExactMatch --> PrivacyRisk
+        ShadowMIA --> PrivacyRisk
+    end
+```

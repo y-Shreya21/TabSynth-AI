@@ -1,0 +1,96 @@
+{
+  "dataset_name": "tabular_dataset",
+  "real_test_samples": 32561,
+  "synthetic_samples": 200,
+  "fidelity": {
+    "mean_kolmogorov_smirnov": 0.1106554774116274,
+    "mean_wasserstein_distance": 0.5216991746880901,
+    "mean_total_variation_distance": 0.2315369045116207,
+    "correlation_frobenius_distance": 1.4482222666274176,
+    "c2st_accuracy": 0.8373545804810534,
+    "per_column_ks": {
+      "age": 0.16660314486655814,
+      "fnlwgt": 0.12483001136328738,
+      "capital-gain": 0.07511685759036879,
+      "capital-loss": 0.04165090138509264,
+      "hours-per-week": 0.14507647185283007
+    },
+    "per_column_wasserstein": {
+      "age": 0.5552487422724125,
+      "fnlwgt": 0.41595293993861215,
+      "capital-gain": 0.9405799724215022,
+      "capital-loss": 0.20757943768260256,
+      "hours-per-week": 0.48913478112532127
+    },
+    "per_column_tvd": {
+      "workclass": 0.2313181448331977,
+      "education": 0.37053944903412056,
+      "education-num": 0.3955394490341206,
+      "marital-status": 0.16506326587021278,
+      "occupation": 0.4128647698417866,
+      "relationship": 0.28917570099198425,
+      "race": 0.11072648260188567,
+      "sex": 0.020794508768158193,
+      "native-country": 0.08781036962912003
+    }
+  },
+  "utility": {
+    "logistic_regression": {
+      "trtr": {
+        "accuracy": 0.8534443045361014,
+        "macro_f1": 0.7858756005790275,
+        "balanced_accuracy": 0.7688506889972178,
+        "precision": 0.8101808621707989,
+        "recall": 0.7688506889972178,
+        "minority_recall": 0.6056625430429792,
+        "auroc": 0.908816771047052
+      },
+      "tstr": {
+        "accuracy": 0.7866158901753632,
+        "macro_f1": 0.7180505577457084,
+        "balanced_accuracy": 0.7261004283558046,
+        "precision": 0.7116856576384066,
+        "recall": 0.7261004283558046,
+        "minority_recall": 0.6093610508863665,
+        "auroc": 0.8375029948998481
+      },
+      "relative_utility_parity": 0.9136949374896661,
+      "minority_recall_delta": 0.003698507843387322
+    },
+    "random_forest": {
+      "trtr": {
+        "accuracy": 0.86299560824299,
+        "macro_f1": 0.7864294298793337,
+        "balanced_accuracy": 0.7556783868628474,
+        "precision": 0.8470243239323422,
+        "recall": 0.7556783868628474,
+        "minority_recall": 0.5486545083535264,
+        "auroc": 0.9237768632971903
+      },
+      "tstr": {
+        "accuracy": 0.8030465894782102,
+        "macro_f1": 0.7300495822831947,
+        "balanced_accuracy": 0.7295196830699472,
+        "precision": 0.7305872608337636,
+        "recall": 0.7295196830699472,
+        "minority_recall": 0.5876801428389236,
+        "auroc": 0.8489577103632099
+      },
+      "relative_utility_parity": 0.9283090822214147,
+      "minority_recall_delta": 0.0390256344853972
+    }
+  },
+  "privacy": {
+    "mean_dcr_train": 0.04086526855826378,
+    "mean_dcr_test": 0.04086526855826378,
+    "dcr_ratio": 1.0,
+    "dcr_5th_percentile_train": 0.0035464605316519737,
+    "exact_record_matches": 0,
+    "exact_match_rate": 0.0,
+    "mean_nndr": 0.7725958228111267,
+    "nndr_below_0_5_fraction": 0.105,
+    "membership_inference_auroc": 0.49999999999999994,
+    "privacy_risk_assessment": "LOW_RISK",
+    "disclaimer": "Diagnostic heuristic metrics indicate low empirical memorization but do not guarantee mathematical differential privacy."
+  }
+}

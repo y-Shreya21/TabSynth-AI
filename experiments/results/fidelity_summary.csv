@@ -1,0 +1,5 @@
+Model,Mean_KS,Mean_Wasserstein,Mean_TVD,Pearson_Frobenius_Distance,Spearman_Frobenius_Distance,Categorical_Association_Distance,C2ST_Accuracy,C2ST_ROC_AUC,Unseen_Categories
+Gaussian_Copula,0.2314,0.5191,0.0361,0.1099,0.0776,0.4638,0.977,0.9987,0
+TVAE,0.4863,0.4112,0.0586,0.6326,0.5452,0.2244,0.996,1.0,0
+TabDDPM_MLP,0.0364,0.1837,0.118,0.1591,0.1748,0.7121,0.998,1.0,0
+TabSynth_Hybrid,0.0545,0.2115,0.1719,0.1117,0.127,0.941,1.0,1.0,0

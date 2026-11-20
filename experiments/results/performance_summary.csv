@@ -1,0 +1,5 @@
+Model,Parameters,Fit_Time_Sec,Sample_Time_Sec,Throughput_Rows_Per_Sec,Hardware_Device,Peak_VRAM_Usage
+Gaussian_Copula,20,0.0144,0.0015,331722.9,Apple MPS / CPU,< 500 MB (Unified)
+TVAE,79556,11.2485,0.228,2192.9,Apple MPS / CPU,< 500 MB (Unified)
+TabDDPM_MLP,177478,0.0,3.4307,145.7,Apple MPS / CPU,< 500 MB (Unified)
+TabSynth_Hybrid,240198,0.0,2.4377,205.1,Apple MPS / CPU,< 500 MB (Unified)

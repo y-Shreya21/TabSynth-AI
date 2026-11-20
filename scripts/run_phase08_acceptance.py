@@ -397,9 +397,14 @@ def run_acceptance_tests():
     t0 = time.time()
     df_mismatched = pd.DataFrame({"random_col_1": [1, 2], "random_col_2": [3, 4]})
     try:
-        from tabsynth.evaluation.fidelity import evaluate_all_fidelity_metrics
+        from tabsynth.evaluation.fidelity import evaluate_statistical_fidelity
         schema = infer_table_schema(df_mixed, target_column="income")
-        evaluate_all_fidelity_metrics(df_mixed, df_mismatched, schema)
+        evaluate_statistical_fidelity(
+            df_mixed,
+            df_mismatched,
+            continuous_cols=schema.continuous_columns,
+            categorical_cols=schema.categorical_columns,
+        )
         mismatch_handled = False
     except (ValueError, KeyError, AssertionError):
         mismatch_handled = True

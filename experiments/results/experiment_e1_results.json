@@ -1,0 +1,46 @@
+{
+  "hybrid": [
+    {
+      "seed": 42,
+      "sampling_time_sec": 1.4876186847686768,
+      "mean_ks": 0.1039279426816786,
+      "mean_tvd": 0.26627649428494987,
+      "correlation_frobenius": 1.607099019457528,
+      "c2st_accuracy": 0.9920009830189471,
+      "rf_f1_parity": 0.8255671837683259,
+      "rf_minority_recall_delta": -0.244047619047619
+    },
+    {
+      "seed": 1337,
+      "sampling_time_sec": 1.0963518619537354,
+      "mean_ks": 0.11323930399181166,
+      "mean_tvd": 0.24705488851370078,
+      "correlation_frobenius": 1.7457561864612827,
+      "c2st_accuracy": 0.994994994994995,
+      "rf_f1_parity": 0.8059990262482226,
+      "rf_minority_recall_delta": -0.26275510204081637
+    }
+  ],
+  "mlp_only": [
+    {
+      "seed": 42,
+      "sampling_time_sec": 0.7511959075927734,
+      "mean_ks": 0.1466042988741044,
+      "mean_tvd": 0.2927613955625341,
+      "correlation_frobenius": 1.4921064365365302,
+      "c2st_accuracy": 0.9950039860219501,
+      "rf_f1_parity": 0.9237344703913462,
+      "rf_minority_recall_delta": -0.005952380952380931
+    },
+    {
+      "seed": 1337,
+      "sampling_time_sec": 0.6698148250579834,
+      "mean_ks": 0.11447082906857728,
+      "mean_tvd": 0.2942777769985738,
+      "correlation_frobenius": 1.8642098934605993,
+      "c2st_accuracy": 0.9979979979979979,
+      "rf_f1_parity": 0.9075775542411635,
+      "rf_minority_recall_delta": -0.0008503401360543394
+    }
+  ]
+}

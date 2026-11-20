@@ -1,0 +1,10 @@
+# TabSynth AI - Phase 05 Benchmark Comparison
+
+| Model | Params | Throughput (rows/s) | Mean KS ↓ | Mean Wasserstein ↓ | Mean TVD ↓ | Correlation Frob. ↓ | C2ST ROC-AUC (~0.5) | TSTR RF Macro-F1 ↑ | TSTR/TRTR F1 Parity ↑ | Mean DCR Train | DCR Ratio (~1.0) | NNDR Mean | Exact Matches | MIA ROC-AUC (~0.5) | Privacy Risk |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Gaussian_Copula | 20 | 331722.9 | 0.2314 | 0.5191 | 0.0361 | 0.1099 | 0.9987 | 0.4316 | 0.5541 | 0.1831 | 0.9816 | 0.9143 | 0 | 0.4997 | LOW_RISK |
+| TVAE | 79556 | 2192.9 | 0.4863 | 0.4112 | 0.0586 | 0.6326 | 1.0 | 0.6431 | 0.8258 | 0.0946 | 0.9867 | 0.7901 | 0 | 0.4978 | LOW_RISK |
+| TabDDPM_MLP | 177478 | 145.7 | 0.0364 | 0.1837 | 0.118 | 0.1591 | 1.0 | 0.4696 | 0.6029 | 0.1394 | 0.9855 | 0.8869 | 0 | 0.49 | LOW_RISK |
+| TabSynth_Hybrid | 240198 | 205.1 | 0.0545 | 0.2115 | 0.1719 | 0.1117 | 1.0 | 0.46 | 0.5906 | 0.1165 | 1.0155 | 0.9052 | 0 | 0.4907 | LOW_RISK |
+
+Total benchmark run duration: 48.29 seconds.

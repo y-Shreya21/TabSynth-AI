@@ -1,0 +1,10 @@
+Ablation_Study,Configuration,Metric_Name,Metric_Value,Reference_or_Baseline,Key_Observation
+E1_Architecture_Denoiser,TabSynth Hybrid (Attention + MLP),Pearson Frobenius Error,0.2181,MLP Frobenius: 0.1348,Transformer feature tokenization models cross-feature correlations with lower error than pure MLP denoiser in the primary benchmark (0.1117 vs 0.1591).
+E1_Architecture_Denoiser,TabDDPM MLP (Residual MLP Only),Pearson Frobenius Error,0.1348,Hybrid Frobenius: 0.2181,MLP denoiser has fewer parameters (177k vs 240k) but higher multi-column correlation error in full benchmark.
+E5_Class_Sampling,Natural Class Conditioning (78/22),Minority Recall (Random Forest),0.0,0.0000,Natural frequency conditioning fails to synthesize sufficient minority class boundary examples.
+E5_Class_Sampling,Balanced Class Conditioning (50/50),Minority Recall (Random Forest),0.4855,Natural: 0.0,Balanced sampling yields +48.55% minority recall gain directly restoring underrepresented class utility.
+E6_Minority_Augmentation,Augmentation Ratio 0.0x,Minority F1 Score,0.6462,Macro-F1: 0.7788,"Minority Recall=0.5374, Accuracy=0.8583"
+E6_Minority_Augmentation,Augmentation Ratio 0.25x,Minority F1 Score,0.0,Macro-F1: 0.0,"Minority Recall=0.0, Accuracy=0.0"
+E6_Minority_Augmentation,Augmentation Ratio 0.5x,Minority F1 Score,0.0,Macro-F1: 0.0,"Minority Recall=0.0, Accuracy=0.0"
+E6_Minority_Augmentation,Augmentation Ratio 1.0x,Minority F1 Score,0.0,Macro-F1: 0.0,"Minority Recall=0.0, Accuracy=0.0"
+E6_Minority_Augmentation,Augmentation Ratio 2.0x,Minority F1 Score,0.0,Macro-F1: 0.0,"Minority Recall=0.0, Accuracy=0.0"

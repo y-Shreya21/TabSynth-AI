@@ -65,8 +65,11 @@ outputs/private/
 # Model Checkpoints & Serialized Artifacts
 checkpoints/*
 !checkpoints/.gitkeep
-artifacts/
-*.pt
+!checkpoints/adult_hybrid_best.pt
+!checkpoints/adult_mlp_best.pt
+artifacts/*
+!artifacts/.gitkeep
+!artifacts/phase05_benchmark/
 *.pth
 *.ckpt
 *.safetensors
@@ -77,10 +80,13 @@ experiments/logs/*
 !experiments/logs/.gitkeep
 experiments/results/*
 !experiments/results/.gitkeep
+!experiments/results/*.csv
+!experiments/results/*.json
 mlruns/
 .mlflow/
 logs/
 tensorboard/
+*.log
 
 # Pytest & Coverage
 .pytest_cache/
