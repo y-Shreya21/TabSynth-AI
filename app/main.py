@@ -89,7 +89,7 @@ st.set_page_config(
     page_title="TabSynth Analytics",
     page_icon="🧬",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # Inject Dark SaaS Design System CSS
@@ -108,49 +108,7 @@ def load_csv(path: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-# Sidebar Brand & Telemetry Header
-st.sidebar.html(
-    textwrap.dedent(
-        """
-        <div class="ts-brand-box">
-            <div class="ts-brand-title">🧬 TabSynth Analytics</div>
-            <div class="ts-brand-subtitle">Hybrid Diffusion Research Platform</div>
-        </div>
-        """
-    ).strip()
-)
-
-backend_online = api_client.is_online()
-if backend_online:
-    st.sidebar.html(
-        textwrap.dedent(
-            f"""
-            <div style="margin-bottom: 1.25rem; padding: 0.4rem 0.6rem; background: #131B2E; border: 1px solid #1E283D; border-radius: 6px; display:flex; align-items:center; justify-content:space-between;">
-                <span style="font-size:0.75rem; color:#8F9CAE;">Engine Status</span>
-                {get_status_badge_html("online", pulse=True)}
-            </div>
-            """
-        ).strip()
-    )
-else:
-    st.sidebar.html(
-        textwrap.dedent(
-            f"""
-            <div style="margin-bottom: 1.25rem; padding: 0.4rem 0.6rem; background: #131B2E; border: 1px solid #1E283D; border-radius: 6px; display:flex; align-items:center; justify-content:space-between;">
-                <span style="font-size:0.75rem; color:#8F9CAE;">Engine Status</span>
-                {get_status_badge_html("offline")}
-            </div>
-            """
-        ).strip()
-    )
-
 # Categorized 10-View Navigation Architecture
-st.sidebar.html(
-    textwrap.dedent(
-        "<div style='font-size:0.7rem; font-weight:700; color:#8B5CF6; letter-spacing:0.08em; margin-bottom:0.4rem; text-transform:uppercase;'>Navigation</div>"
-    ).strip()
-)
-
 PAGE_OPTIONS = [
     # WORKSPACE
     "Overview Dashboard",
@@ -181,15 +139,87 @@ PAGE_ICONS = {
     "Experiment Explorer": "📜",
 }
 
-page = st.sidebar.radio(
-    "Navigation views",
-    PAGE_OPTIONS,
-    format_func=lambda x: f"{PAGE_ICONS.get(x, '•')} {x}",
-    label_visibility="collapsed",
+backend_online = api_client.is_online()
+device = select_device("auto")
+device_label = f"PyTorch • {str(device).upper()}"
+status_badge_html = get_status_badge_html("online", pulse=True) if backend_online else get_status_badge_html("offline")
+
+# =============================================================================
+# Top Header: Brand Identity & Live Engine Telemetry
+# =============================================================================
+st.html(
+    textwrap.dedent(
+        f"""
+        <div class="ts-top-header">
+            <div class="ts-top-brand">
+                <span class="ts-top-brand-icon">🧬</span>
+                <div>
+                    <div class="ts-top-brand-title">TabSynth Analytics</div>
+                    <div class="ts-top-brand-subtitle">Hybrid Diffusion Research Platform</div>
+                </div>
+            </div>
+            <div class="ts-top-meta">
+                <div class="ts-top-chip">
+                    <span class="ts-chip-dot"></span>
+                    <span>{device_label}</span>
+                </div>
+                <div class="ts-top-status-badge">
+                    <span class="ts-top-status-label">Engine:</span>
+                    {status_badge_html}
+                </div>
+            </div>
+        </div>
+        """
+    ).strip()
 )
 
+# Navigation State Management
+if "nav_page" not in st.session_state or st.session_state["nav_page"] not in PAGE_OPTIONS:
+    st.session_state["nav_page"] = "Overview Dashboard"
+
+# =============================================================================
+# Top Navigation Bar: 10 Analytical Research Views
+# =============================================================================
+selected_nav = st.pills(
+    "Navigation Views",
+    PAGE_OPTIONS,
+    default=st.session_state["nav_page"],
+    format_func=lambda x: f"{PAGE_ICONS.get(x, '•')} {x}",
+    label_visibility="collapsed",
+    required=True,
+    key="top_navbar_pills",
+)
+
+if selected_nav and selected_nav != st.session_state["nav_page"]:
+    st.session_state["nav_page"] = selected_nav
+
+page = st.session_state["nav_page"]
+
+# Secondary Sidebar Telemetry & Quick Diagnostic Jump (When User Expands Sidebar)
+st.sidebar.html(
+    textwrap.dedent(
+        """
+        <div class="ts-brand-box">
+            <div class="ts-brand-title">🧬 TabSynth Analytics</div>
+            <div class="ts-brand-subtitle">Hybrid Diffusion Research Platform</div>
+        </div>
+        """
+    ).strip()
+)
+st.sidebar.html(
+    f"""
+    <div style="margin-bottom:0.75rem; padding:0.4rem 0.6rem; background:#131B2E; border:1px solid #1E283D; border-radius:6px; display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-size:0.75rem; color:#8F9CAE;">Engine Status</span>
+        {status_badge_html}
+    </div>
+    """
+)
+st.sidebar.caption("System Telemetry")
+st.sidebar.caption(f"Active View: {PAGE_ICONS.get(page, '')} {page}")
 st.sidebar.markdown("---")
-st.sidebar.caption("TabSynth AI Research • PyTorch • Apple Silicon M4")
+st.sidebar.caption("Primary navigation is located in the top navigation bar.")
+st.sidebar.caption(f"Hardware Platform: {device_label}")
+
 
 
 # =============================================================================

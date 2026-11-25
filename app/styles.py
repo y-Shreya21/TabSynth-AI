@@ -462,5 +462,116 @@ div[data-baseweb="input"], div[data-baseweb="select"] {
 code, pre {
     font-family: 'JetBrains Mono', monospace !important;
 }
+
+/* =========================================================================
+   Top Navigation Bar & Header System
+   ========================================================================= */
+.ts-top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #131B2E 0%, #0F1420 100%);
+    border: 1px solid #1E283D;
+    border-radius: 8px;
+    padding: 0.65rem 1.15rem;
+    margin-bottom: 0.6rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+.ts-top-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.ts-top-brand-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+.ts-top-brand-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #F8FAFC;
+    letter-spacing: -0.01em;
+}
+.ts-top-brand-subtitle {
+    font-size: 0.74rem;
+    color: #8F9CAE;
+    font-weight: 500;
+}
+.ts-top-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+.ts-top-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    color: #94A3B8;
+    background: #182238;
+    border: 1px solid #1E283D;
+    border-radius: 6px;
+    padding: 0.25rem 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+.ts-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #8B5CF6;
+}
+.ts-top-status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #8F9CAE;
+    background: #182238;
+    border: 1px solid #1E283D;
+    border-radius: 6px;
+    padding: 0.25rem 0.65rem;
+}
+.ts-top-status-label {
+    font-weight: 600;
+    color: #8F9CAE;
+}
+
+/* Top Navigation Pills Styling */
+.st-key-top_navbar_pills {
+    margin-bottom: 1.25rem !important;
+    padding-bottom: 0.75rem !important;
+    border-bottom: 1px solid #1E283D !important;
+}
+.st-key-top_navbar_pills [role="radiogroup"],
+.st-key-top_navbar_pills div[data-testid="stPills"] {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.45rem !important;
+    align-items: center !important;
+}
+.st-key-top_navbar_pills button {
+    background-color: #131B2E !important;
+    border: 1px solid #1E283D !important;
+    color: #8F9CAE !important;
+    font-size: 0.82rem !important;
+    font-weight: 500 !important;
+    border-radius: 6px !important;
+    padding: 0.35rem 0.75rem !important;
+    transition: all 0.15s ease-in-out !important;
+}
+.st-key-top_navbar_pills button:hover {
+    border-color: #8B5CF6 !important;
+    color: #F8FAFC !important;
+    background-color: #182238 !important;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.25) !important;
+}
+.st-key-top_navbar_pills button[aria-checked="true"],
+.st-key-top_navbar_pills button[data-checked="true"] {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(124, 58, 237, 0.35) 100%) !important;
+    border: 1px solid #8B5CF6 !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+    box-shadow: 0 0 14px rgba(139, 92, 246, 0.35) !important;
+}
 </style>
 """

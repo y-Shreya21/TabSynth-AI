@@ -3,25 +3,25 @@
     "W01": {
       "name": "Upload CSV dataset (valid, mixed types)",
       "status": "PASS",
-      "duration_sec": 0.0392,
-      "notes": "Dataset ID: ds_19f81f3066"
+      "duration_sec": 0.0173,
+      "notes": "Dataset ID: ds_e42d0e03db"
     },
     "W02": {
       "name": "Upload CSV with missing values (imputation verification)",
       "status": "PASS",
-      "duration_sec": 0.0054,
+      "duration_sec": 0.0055,
       "notes": "Nulls detected & handled"
     },
     "W03": {
       "name": "View dataset overview, statistics, schema inference",
       "status": "PASS",
-      "duration_sec": 0.0042,
+      "duration_sec": 0.0038,
       "notes": "Continuous: ['age', 'fnlwgt']"
     },
     "W04": {
       "name": "Inspect feature distributions and correlations",
       "status": "PASS",
-      "duration_sec": 0.0042,
+      "duration_sec": 0.0047,
       "notes": "Profile endpoint verified"
     },
     "W05": {
@@ -39,7 +39,7 @@
     "W07": {
       "name": "Configure noise schedules (Linear, Cosine, Cosine-Log)",
       "status": "PASS",
-      "duration_sec": 0.0169,
+      "duration_sec": 0.0004,
       "notes": "Schedules initialized successfully"
     },
     "W08": {
@@ -51,43 +51,43 @@
     "W09": {
       "name": "Start training run via API",
       "status": "PASS",
-      "duration_sec": 0.003,
-      "notes": "Dispatched Job ID: job_dccba3895e"
+      "duration_sec": 0.0044,
+      "notes": "Dispatched Job ID: job_967597f040"
     },
     "W10": {
       "name": "Monitor training progress (polling / SSE status check)",
       "status": "PASS",
-      "duration_sec": 0.9353,
+      "duration_sec": 0.9382,
       "notes": "Final status: completed"
     },
     "W11": {
       "name": "View live training loss curves (continuous, categorical, total)",
       "status": "PASS",
-      "duration_sec": 0.0014,
-      "notes": "Model ID: model_e281ad8521"
+      "duration_sec": 0.0024,
+      "notes": "Model ID: model_3bf2450016"
     },
     "W12": {
       "name": "Cancel a running training job",
       "status": "PASS",
-      "duration_sec": 0.0152,
-      "notes": "Cancelled job: job_b046daeedb"
+      "duration_sec": 0.0215,
+      "notes": "Cancelled job: job_a5e50ff7b3"
     },
     "W13": {
       "name": "Generate synthetic samples unconditionally",
       "status": "PASS",
-      "duration_sec": 2.1113,
+      "duration_sec": 1.3722,
       "notes": "Generated 20 samples"
     },
     "W14": {
       "name": "Generate synthetic samples conditionally (target class specification)",
       "status": "PASS",
-      "duration_sec": 0.0819,
+      "duration_sec": 0.0856,
       "notes": "Balanced class conditioning verified"
     },
     "W15": {
       "name": "Apply Classifier-Free Guidance with custom guidance scale (w)",
       "status": "PASS",
-      "duration_sec": 0.0633,
+      "duration_sec": 0.0698,
       "notes": "CFG scale w=1.5 validated"
     },
     "W16": {
@@ -99,19 +99,19 @@
     "W17": {
       "name": "Run fidelity evaluation on generated data",
       "status": "PASS",
-      "duration_sec": 0.4367,
-      "notes": "Mean KS: 0.5417"
+      "duration_sec": 0.432,
+      "notes": "Mean KS: 0.475"
     },
     "W18": {
       "name": "View fidelity report: KS test, Wasserstein, TVD, Frobenius norm",
       "status": "PASS",
       "duration_sec": 0.0,
-      "notes": "Frobenius: 0.3425"
+      "notes": "Frobenius: 0.6772"
     },
     "W19": {
       "name": "Run utility evaluation (TSTR vs TRTR)",
       "status": "PASS",
-      "duration_sec": 1.038,
+      "duration_sec": 1.1574,
       "notes": "Evaluated classifiers"
     },
     "W20": {
@@ -123,7 +123,7 @@
     "W21": {
       "name": "Run privacy evaluation (DCR, NNDR, MIA, exact match)",
       "status": "PASS",
-      "duration_sec": 0.0185,
+      "duration_sec": 0.0163,
       "notes": "DCR Ratio: 1.0"
     },
     "W22": {
@@ -149,19 +149,19 @@
     "B02": {
       "name": "Non-CSV file upload -> 400 Bad Request",
       "status": "PASS",
-      "duration_sec": 0.002,
+      "duration_sec": 0.0019,
       "notes": "Non-csv rejected with HTTP 400"
     },
     "B03": {
       "name": "Single-column dataset -> validation error / handled",
       "status": "PASS",
-      "duration_sec": 0.0022,
+      "duration_sec": 0.0023,
       "notes": "Handled safely without crash"
     },
     "B04": {
       "name": "All-categorical dataset -> handled gracefully",
       "status": "PASS",
-      "duration_sec": 0.0009,
+      "duration_sec": 0.0005,
       "notes": "Continuous columns = 0 cleanly supported"
     },
     "B05": {
@@ -173,19 +173,19 @@
     "B06": {
       "name": "Target column not found in dataset -> 400 Bad Request",
       "status": "PASS",
-      "duration_sec": 0.0023,
+      "duration_sec": 0.0029,
       "notes": "HTTP 400 target column error"
     },
     "B07": {
       "name": "Invalid hyperparameter values -> 422 validation error",
       "status": "PASS",
-      "duration_sec": 0.0023,
+      "duration_sec": 0.0025,
       "notes": "HTTP 422 rejected negative values"
     },
     "B08": {
       "name": "Sampling request with count <= 0 -> 422 Unprocessable Entity",
       "status": "PASS",
-      "duration_sec": 0.0017,
+      "duration_sec": 0.0018,
       "notes": "HTTP 422 rejected count <= 0"
     },
     "B09": {
@@ -197,13 +197,13 @@
     "B10": {
       "name": "Cancel nonexistent job -> 404 / 400 handled",
       "status": "PASS",
-      "duration_sec": 0.0022,
+      "duration_sec": 0.0021,
       "notes": "Handled with HTTP 400"
     },
     "B11": {
       "name": "Evaluation with mismatched schemas -> exception handled",
       "status": "PASS",
-      "duration_sec": 0.0015,
+      "duration_sec": 0.0017,
       "notes": "Schema mismatch caught safely"
     }
   }
