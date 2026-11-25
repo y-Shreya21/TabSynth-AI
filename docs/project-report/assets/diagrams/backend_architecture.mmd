@@ -1,0 +1,13 @@
+flowchart TD
+    Client["Streamlit UI / REST Client"] --> Router["FastAPI Routing Layer (api/routes/)"]
+    Router --> DatasetsAPI["/api/v1/datasets"]
+    Router --> ModelsAPI["/api/v1/models"]
+    Router --> JobsAPI["/api/v1/jobs"]
+    Router --> EvalAPI["/api/v1/evaluate"]
+    JobsAPI --> TaskRunner["Background Task Worker (AsyncIO ThreadPool)"]
+    TaskRunner --> TrainEngine["Diffusion Training Engine (src/diffusion/)"]
+    TaskRunner --> SamplerEngine["Reverse Sampler (src/diffusion/sampler.py)"]
+    DatasetsAPI --> Storage["Local Artifact Store (artifacts/ / data/)"]
+    ModelsAPI --> Storage
+    TaskRunner --> Storage
+    Router --> DB[(SQLite Database / WAL Mode)]

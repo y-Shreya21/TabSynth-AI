@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" width="720" height="380" style="background-color: #0F172A; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;">
+<rect width="720" height="380" rx="8" fill="#0F172A"/>
+<rect x="10" y="10" width="700" height="360" rx="6" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+<text x="70" y="35" fill="#F8FAFC" font-size="15" font-weight="700">Dataset Dimensionality & Feature Composition (Higher is Better ↑)</text>
+<text x="70" y="52" fill="#94A3B8" font-size="11">Continuous vs Categorical Feature Breakdown across Evaluation Datasets</text>
+<rect x="553" y="38" width="10" height="10" rx="2" fill="#10B981"/>
+<text x="568" y="47" fill="#F8FAFC" font-size="11">Target Attribute</text>
+<rect x="388" y="38" width="10" height="10" rx="2" fill="#38BDF8"/>
+<text x="403" y="47" fill="#F8FAFC" font-size="11">Categorical Features</text>
+<rect x="230" y="38" width="10" height="10" rx="2" fill="#8B5CF6"/>
+<text x="245" y="47" fill="#F8FAFC" font-size="11">Continuous Features</text>
+<line x1="70" y1="320.0" x2="690" y2="320.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="324.0" fill="#94A3B8" font-size="10" text-anchor="end">0.0</text>
+<line x1="70" y1="270.0" x2="690" y2="270.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="274.0" fill="#94A3B8" font-size="10" text-anchor="end">2.1</text>
+<line x1="70" y1="220.0" x2="690" y2="220.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="224.0" fill="#94A3B8" font-size="10" text-anchor="end">4.1</text>
+<line x1="70" y1="170.0" x2="690" y2="170.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="174.0" fill="#94A3B8" font-size="10" text-anchor="end">6.2</text>
+<line x1="70" y1="120.0" x2="690" y2="120.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="124.0" fill="#94A3B8" font-size="10" text-anchor="end">8.3</text>
+<line x1="70" y1="70.0" x2="690" y2="70.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="74.0" fill="#94A3B8" font-size="10" text-anchor="end">10.3</text>
+<text x="173.33333333333331" y="340" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">Adult Income (15 cols)</text>
+<rect x="96.83333333333331" y="175.07246376811594" width="49.666666666666664" height="144.92753623188406" rx="3" fill="#8B5CF6"/>
+<text x="121.66666666666664" y="171.07246376811594" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">6.00</text>
+<rect x="148.49999999999997" y="126.76328502415458" width="49.666666666666664" height="193.23671497584542" rx="3" fill="#38BDF8"/>
+<text x="173.33333333333331" y="122.76328502415458" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">8.00</text>
+<rect x="200.16666666666663" y="295.8454106280193" width="49.666666666666664" height="24.154589371980677" rx="3" fill="#10B981"/>
+<text x="224.99999999999997" y="291.8454106280193" fill="#10B981" font-size="9" font-weight="600" text-anchor="middle">1.00</text>
+<text x="379.99999999999994" y="340" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">Bank Marketing (17 cols)</text>
+<rect x="303.49999999999994" y="150.91787439613526" width="49.666666666666664" height="169.08212560386474" rx="3" fill="#8B5CF6"/>
+<text x="328.33333333333326" y="146.91787439613526" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">7.00</text>
+<rect x="355.16666666666663" y="102.6086956521739" width="49.666666666666664" height="217.3913043478261" rx="3" fill="#38BDF8"/>
+<text x="379.99999999999994" y="98.6086956521739" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">9.00</text>
+<rect x="406.83333333333326" y="295.8454106280193" width="49.666666666666664" height="24.154589371980677" rx="3" fill="#10B981"/>
+<text x="431.6666666666666" y="291.8454106280193" fill="#10B981" font-size="9" font-weight="600" text-anchor="middle">1.00</text>
+<text x="586.6666666666666" y="340" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">Credit Default (12 cols)</text>
+<rect x="510.16666666666663" y="102.6086956521739" width="49.666666666666664" height="217.3913043478261" rx="3" fill="#8B5CF6"/>
+<text x="535.0" y="98.6086956521739" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">9.00</text>
+<rect x="561.8333333333333" y="271.69082125603865" width="49.666666666666664" height="48.309178743961354" rx="3" fill="#38BDF8"/>
+<text x="586.6666666666666" y="267.69082125603865" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">2.00</text>
+<rect x="613.5" y="295.8454106280193" width="49.666666666666664" height="24.154589371980677" rx="3" fill="#10B981"/>
+<text x="638.3333333333334" y="291.8454106280193" fill="#10B981" font-size="9" font-weight="600" text-anchor="middle">1.00</text>
+<line x1="70" y1="70" x2="70" y2="320" stroke="#94A3B8" stroke-width="1.5"/>
+<line x1="70" y1="320" x2="690" y2="320" stroke="#94A3B8" stroke-width="1.5"/>
+</svg>

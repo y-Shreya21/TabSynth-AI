@@ -1,0 +1,38 @@
+flowchart TD
+    subgraph Clients["1. Client Layer"]
+        Browser["User Web Browser"]
+        RESTClient["Automated REST API Consumer / Python SDK"]
+    end
+
+    subgraph ReverseProxy["2. Network & Ingress"]
+        Browser --> StreamlitPort["HTTP Port 8501 (Streamlit Web Dashboard)"]
+        RESTClient --> FastAPIPort["HTTP Port 8000 (FastAPI REST Server)"]
+    end
+
+    subgraph DockerContainer["3. Container Runtime (Docker Compose)"]
+        StreamlitPort --> StreamlitService["Streamlit Platform Container (app/main.py)"]
+        FastAPIPort --> APIService["FastAPI Service Container (api/server.py:app)"]
+        StreamlitService -- "REST Client / Inter-Service HTTP" --> APIService
+        
+        subgraph InternalAPIEngine["FastAPI Internal Architecture"]
+            APIService --> AuthMiddleware["Security & Confinement Middleware"]
+            AuthMiddleware --> RouterGroup["API Routers: Datasets | Models | Generate | Evaluate | Jobs"]
+            RouterGroup --> JobManager["Thread-Safe Background Job Manager"]
+            JobManager --> WorkerThreads["Worker Thread Pool (PyTorch Diffusion Training / Sampling)"]
+        end
+    end
+
+    subgraph PersistenceVolumes["4. Persistent Host Volume Mounts"]
+        APIService --> SQLiteDB["SQLite Database with WAL Mode (data/tabsynth.db)"]
+        WorkerThreads --> CheckpointsVol["Checkpoints Storage (/app/checkpoints)"]
+        WorkerThreads --> DataVol["Tabular Datasets Storage (/app/data)"]
+        WorkerThreads --> ArtifactsVol["Evaluation Artifacts Storage (/app/artifacts)"]
+        SQLiteDB --> HotBackup["scripts/backup_db.py -> /app/backups/"]
+    end
+
+    subgraph HardwareExecution["5. Compute & Acceleration Layer"]
+        WorkerThreads --> HardwareBackend["Hardware Acceleration Engine"]
+        HardwareBackend --> MPS["Apple Silicon MPS (mps:0)"]
+        HardwareBackend --> CUDA["NVIDIA CUDA (cuda:0)"]
+        HardwareBackend --> CPU["Fallback Multi-Core CPU"]
+    end

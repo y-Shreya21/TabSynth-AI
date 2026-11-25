@@ -1,0 +1,45 @@
+flowchart TD
+    subgraph BatchIngestion["1. Zero-Leakage Mini-Batch Ingestion"]
+        TrainDataset["Training Split D_train (Fitted Preprocessor)"] --> DataLoader["PyTorch DataLoader (Batch Size B = 256, Seed = 42)"]
+        DataLoader --> BatchTuple["Tuple: (x_num_0 in R^(B x D_num), x_cat_0 in {0..K_j-1}^(B x D_cat), y in {0..C-1}^B)"]
+    end
+
+    subgraph Perturbation["2. Stochastic Joint Perturbation"]
+        BatchTuple --> SampleT["Sample Timestep Uniformly: t ~ Uniform({1, ..., T})"]
+        SampleT --> GaussNoise["Sample Gaussian Noise: epsilon ~ N(0, I)"]
+        GaussNoise --> NumCorrupt["Compute x_num_t = sqrt(alpha_bar_t)*x_num_0 + sqrt(1 - alpha_bar_t)*epsilon"]
+        SampleT --> CatCorrupt["Sample x_cat_t ~ Cat(x_cat_0 * Q_bar_t)"]
+        BatchTuple --> CFGMask["CFG Masking: Drop Label y -> null with probability p_uncond = 0.15"]
+    end
+
+    subgraph DenoiserForward["3. Denoiser Forward Pass"]
+        NumCorrupt --> Model["TabSynth Hybrid Denoiser (Pre-LN Transformer + Residual MLP)"]
+        CatCorrupt --> Model
+        SampleT --> Model
+        CFGMask --> Model
+        Model --> PredEps["Continuous Noise Prediction: epsilon_theta"]
+        Model --> PredLogits["Categorical Clean Logits: z_theta_0"]
+    end
+
+    subgraph MultiObjectiveLoss["4. Multi-Objective Composite Loss Computation"]
+        PredEps --> L_num["L_MSE = || epsilon - epsilon_theta ||^2"]
+        GaussNoise --> L_num
+        PredLogits --> L_cat["L_CE = - sum_j sum_k x_0,k^(j) * log(Softmax(z_theta,k^(j)))"]
+        BatchTuple --> L_cat
+        L_num --> WeightedSum["L_total = lambda_num * L_MSE + lambda_cat * L_CE + lambda_aux * L_aux"]
+        L_cat --> WeightedSum
+    end
+
+    subgraph OptimizationStep["5. Backward Pass & Parameter Updates"]
+        WeightedSum --> Backprop["Loss Backward Pass: Compute Gradients nabla_theta L_total"]
+        Backprop --> GradClip["Gradient Norm Clipping: Clip to max_norm = 1.0"]
+        GradClip --> OptGroup["AdamW Optimizer: Weight Decay (1e-4) on 2D+ weights; 0.0 on biases/norms"]
+        OptGroup --> WarmupCos["Cosine Annealing LR Scheduler with Linear Warmup (500 steps)"]
+        WarmupCos --> WeightsUpdated["Updated Denoiser Weights theta_t+1"]
+    end
+
+    subgraph ValidationLoop["6. Validation Tracking & Checkpoint Persistence"]
+        WeightsUpdated --> ValCheck["Evaluate Validation Loss on D_val every Epoch"]
+        ValCheck --> EarlyStopping["Early Stopping Monitor (Patience = 10 epochs)"]
+        EarlyStopping --> SaveBest["CheckpointManager: Persist Best Model (checkpoints/adult_hybrid_best.pt)"]
+    end

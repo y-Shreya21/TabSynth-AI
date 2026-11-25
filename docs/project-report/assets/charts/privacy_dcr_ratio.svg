@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 380" width="740" height="380" style="background-color: #0F172A; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;">
+<rect width="740" height="380" rx="8" fill="#0F172A"/>
+<rect x="10" y="10" width="720" height="360" rx="6" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+<text x="70" y="35" fill="#F8FAFC" font-size="15" font-weight="700">Empirical Privacy Indicators: DCR Ratio & NNDR (Higher is Better ↑)</text>
+<text x="70" y="52" fill="#94A3B8" font-size="11">Distance to Closest Record (DCR) Ratio (~1.0 indicates generalization without memorization)</text>
+<rect x="622" y="38" width="10" height="10" rx="2" fill="#38BDF8"/>
+<text x="637" y="47" fill="#F8FAFC" font-size="11">Mean NNDR</text>
+<rect x="443" y="38" width="10" height="10" rx="2" fill="#8B5CF6"/>
+<text x="458" y="47" fill="#F8FAFC" font-size="11">DCR Ratio (Train/Test)</text>
+<line x1="70" y1="320.0" x2="710" y2="320.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="324.0" fill="#94A3B8" font-size="10" text-anchor="end">0.000</text>
+<line x1="70" y1="270.0" x2="710" y2="270.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="274.0" fill="#94A3B8" font-size="10" text-anchor="end">0.234</text>
+<line x1="70" y1="220.0" x2="710" y2="220.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="224.0" fill="#94A3B8" font-size="10" text-anchor="end">0.467</text>
+<line x1="70" y1="170.0" x2="710" y2="170.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="174.0" fill="#94A3B8" font-size="10" text-anchor="end">0.701</text>
+<line x1="70" y1="120.0" x2="710" y2="120.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="124.0" fill="#94A3B8" font-size="10" text-anchor="end">0.934</text>
+<line x1="70" y1="70.0" x2="710" y2="70.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="74.0" fill="#94A3B8" font-size="10" text-anchor="end">1.168</text>
+<text x="150.0" y="340" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">Gaussian Copula</text>
+<rect x="91.0" y="109.86577612227856" width="58.0" height="210.13422387772144" rx="3" fill="#8B5CF6"/>
+<text x="120.0" y="105.86577612227856" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">0.9816</text>
+<rect x="151.0" y="124.27290047738313" width="58.0" height="195.72709952261687" rx="3" fill="#38BDF8"/>
+<text x="180.0" y="120.27290047738313" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">0.9143</text>
+<text x="310.0" y="340" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">TVAE</text>
+<rect x="251.0" y="108.77400295420972" width="58.0" height="211.22599704579028" rx="3" fill="#8B5CF6"/>
+<text x="280.0" y="104.77400295420972" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">0.9867</text>
+<rect x="311.0" y="150.86078821741268" width="58.0" height="169.13921178258732" rx="3" fill="#38BDF8"/>
+<text x="340.0" y="146.86078821741268" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">0.7901</text>
+<text x="470.0" y="340" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">TabDDPM MLP</text>
+<rect x="411.0" y="109.03089075846123" width="58.0" height="210.96910924153877" rx="3" fill="#8B5CF6"/>
+<text x="440.0" y="105.03089075846123" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">0.9855</text>
+<rect x="471.0" y="130.13850534112558" width="58.0" height="189.86149465887442" rx="3" fill="#38BDF8"/>
+<text x="500.0" y="126.13850534112558" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">0.8869</text>
+<text x="630.0" y="340" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">TabSynth Hybrid</text>
+<rect x="571.0" y="102.60869565217388" width="58.0" height="217.39130434782612" rx="3" fill="#8B5CF6"/>
+<text x="600.0" y="98.60869565217388" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">1.02</text>
+<rect x="631.0" y="126.22096632629032" width="58.0" height="193.77903367370968" rx="3" fill="#38BDF8"/>
+<text x="660.0" y="122.22096632629032" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">0.9052</text>
+<line x1="70" y1="70" x2="70" y2="320" stroke="#94A3B8" stroke-width="1.5"/>
+<line x1="70" y1="320" x2="710" y2="320" stroke="#94A3B8" stroke-width="1.5"/>
+</svg>

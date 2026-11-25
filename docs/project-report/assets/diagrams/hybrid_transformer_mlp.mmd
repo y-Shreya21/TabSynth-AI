@@ -1,0 +1,55 @@
+flowchart TD
+    subgraph Inputs["1. Mixed-Type Input Features & Conditioning"]
+        X_num["Continuous Vector: x_num_t in R^(B x D_num)"]
+        X_cat["Categorical Indices: x_cat_t in {0..K_j-1}^(B x D_cat)"]
+        T_step["Timestep: t in {1..T}"]
+        Y_class["Class Label: c in {0..C-1, null}"]
+    end
+
+    subgraph FeatureTokenization["2. Column-Wise Feature Tokenization"]
+        X_num --> LinearProjs["D_num Independent Linear Projections (1 -> d_model)"]
+        X_cat --> Embeddings["D_cat Independent Category Embeddings (K_j -> d_model)"]
+        LinearProjs --> TokenStack["Stack Tokens: T_feat in R^(B x (D_num + D_cat) x d_model)"]
+        Embeddings --> TokenStack
+        ColIdentities["Learnable Column Identity Embeddings E_col in R^((D_num + D_cat) x d_model)"] --> AddCol
+        TokenStack --> AddCol["Elementwise Sum: Z_0 = T_feat + E_col"]
+    end
+
+    subgraph ConditioningEmbedding["3. Conditioning Feature Embeddings"]
+        T_step --> Sinusoidal["Sinusoidal Position Encoding (d_model)"]
+        Sinusoidal --> TimeMLP["Time MLP (d_model -> d_model) with SiLU"]
+        TimeMLP --> E_time["Time Vector e_t in R^(B x d_model)"]
+
+        Y_class --> ClassEmbTable["Class Embedding Table with Mask Token null"]
+        ClassEmbTable --> E_class["Class Vector e_c in R^(B x d_model)"]
+        
+        E_time --> CondFusion["Sum Conditioning: e_cond = e_t + e_c"]
+        E_class --> CondFusion
+    end
+
+    subgraph TransformerEncoder["4. Pre-LN Transformer Multi-Head Self-Attention"]
+        AddCol --> LayerNorm1["LayerNorm(Z_l-1)"]
+        LayerNorm1 --> MHSA["Multi-Head Self-Attention (Heads = 4, O(D^2))"]
+        MHSA --> ResAdd1["Residual Connection: Z'_l = Z_l-1 + MHSA(...)"]
+        ResAdd1 --> LayerNorm2["LayerNorm(Z'_l)"]
+        LayerNorm2 --> FFN["Feed-Forward Network (d_model -> 2*d_model -> d_model)"]
+        FFN --> ResAdd2["Residual Connection: Z_l = Z'_l + FFN(...)"]
+        ResAdd2 --> RepeatLayers["Repeat for L_transformer Encoder Layers"]
+        RepeatLayers --> Flatten["Flatten Contextual Tokens: H_trans in R^(B x (D * d_model))"]
+    end
+
+    subgraph ResidualMLP["5. Residual MLP Processing Network"]
+        Flatten --> Concat["Concatenate: [H_trans; e_cond]"]
+        Concat --> LinearIn["Linear Input Projection -> hidden_dim"]
+        LinearIn --> ResBlock1["Residual MLP Block 1 (LayerNorm + SiLU + Linear + Dropout)"]
+        ResBlock1 --> ResBlock2["Residual MLP Block 2 (LayerNorm + SiLU + Linear + Dropout)"]
+        ResBlock2 --> RepeatMLP["Repeat for L_mlp Residual Blocks"]
+        RepeatMLP --> H_final["Processed Feature Representation in R^(B x hidden_dim)"]
+    end
+
+    subgraph DualOutputHeads["6. Dual Mixed-Type Output Heads"]
+        H_final --> HeadNum["Continuous Linear Head (hidden_dim -> D_num)"]
+        H_final --> HeadCat["Categorical Linear Heads (hidden_dim -> sum(K_j))"]
+        HeadNum --> EpsilonPred["Continuous Noise Estimate: epsilon_theta(x_t, t, c)"]
+        HeadCat --> LogitsPred["Categorical Clean Logits: p_theta_0(x_t, t, c)"]
+    end

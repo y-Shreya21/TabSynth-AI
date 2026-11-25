@@ -1,0 +1,14 @@
+flowchart TD
+    Start(["Start Reverse Sampling (t = T)"]) --> InitNoise["Sample Continuous Noise: x_num_T ~ N(0, I)"]
+    InitNoise --> InitCat["Sample Categorical Noise: x_cat_T ~ Cat(Uniform(1/K))"]
+    InitCat --> LoopStart{"Timestep Loop t = T down to 1"}
+    LoopStart --> EmbedCondition["Compute Class Embedding with CFG Guidance w"]
+    EmbedCondition --> PredictStep["Denoiser Forward Pass: Predict epsilon_theta and p_0_logits"]
+    PredictStep --> CFGCombine["Apply CFG: eps_cfg = (1+w)*eps_cond - w*eps_uncond"]
+    CFGCombine --> NumStep["Gaussian Reverse Step: Compute mean mu_theta and sample x_num_{t-1}"]
+    CFGCombine --> CatStep["D3PM Posterior Step: Compute q(x_{t-1} | x_t, x_0) and sample x_cat_{t-1}"]
+    NumStep --> CheckLoop{"t == 1 ?"}
+    CatStep --> CheckLoop
+    CheckLoop -- No --> LoopStart
+    CheckLoop -- Yes --> InvTransform["Inverse Tabular Preprocessing (Quantile & Ordinal Inversion)"]
+    InvTransform --> FinalSynth(["Output: High-Fidelity Synthetic Tabular Records"])

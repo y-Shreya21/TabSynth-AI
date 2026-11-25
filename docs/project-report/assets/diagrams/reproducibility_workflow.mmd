@@ -1,0 +1,8 @@
+flowchart TD
+    Config["Configuration YAML / Hyperparameters"] --> SeedInit["Global Seed Injection (PyTorch, NumPy, Python)"]
+    SeedInit --> SplitData["Deterministic Stratified Split (Hash-Verified)"]
+    SplitData --> FitTransform["Fit Preprocessor on Training Split Only"]
+    FitTransform --> Serialize["Persist preprocessor.pkl & model.pt Checkpoint"]
+    Serialize --> MetadataLog["Record Experiment Metadata & Git SHA in SQLite"]
+    MetadataLog --> DeterministicEval["Deterministic Multi-Classifier Evaluation"]
+    DeterministicEval --> ConsolidatedJSON["Immutable Export: benchmark_summary.json"]

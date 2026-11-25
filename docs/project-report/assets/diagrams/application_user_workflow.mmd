@@ -1,0 +1,10 @@
+flowchart LR
+    Upload["1. Ingest Data (Dataset Manager)"] --> Explore["2. Profile Distributions (Data Explorer)"]
+    Explore --> Configure["3. Configure Model (Model Studio)"]
+    Configure --> Train["4. Train Diffusion Job (Background Queue)"]
+    Train --> Generate["5. Steer Sampling (Synthetic Generator)"]
+    Generate --> Fidelity["6. Audit Fidelity (KS, Wass, Frobenius)"]
+    Fidelity --> Utility["7. Test Downstream ML (TSTR vs TRTR)"]
+    Utility --> Privacy["8. Audit Privacy (DCR, NNDR, MIA)"]
+    Privacy --> Benchmark["9. Compare Baselines (Benchmark Center)"]
+    Benchmark --> Export["10. Inspect History & Export (Experiment Explorer)"]

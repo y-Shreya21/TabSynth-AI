@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 400" width="740" height="400" style="background-color: #0F172A; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;">
+<rect width="740" height="400" rx="8" fill="#0F172A"/>
+<rect x="10" y="10" width="720" height="380" rx="6" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+<text x="70" y="35" fill="#F8FAFC" font-size="15" font-weight="700">Downstream ML Utility: TSTR Macro-F1 (Higher is Better ↑)</text>
+<text x="70" y="52" fill="#94A3B8" font-size="11">Train on Synthetic, Test on Real (TSTR) Macro-F1 across 3 Standard Classifiers</text>
+<rect x="552" y="38" width="10" height="10" rx="2" fill="#10B981"/>
+<text x="567" y="47" fill="#F8FAFC" font-size="11">Logistic Regression</text>
+<rect x="408" y="38" width="10" height="10" rx="2" fill="#38BDF8"/>
+<text x="423" y="47" fill="#F8FAFC" font-size="11">HistGradientBoost</text>
+<rect x="292" y="38" width="10" height="10" rx="2" fill="#8B5CF6"/>
+<text x="307" y="47" fill="#F8FAFC" font-size="11">Random Forest</text>
+<line x1="70" y1="340.0" x2="710" y2="340.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="344.0" fill="#94A3B8" font-size="10" text-anchor="end">0.000</text>
+<line x1="70" y1="286.0" x2="710" y2="286.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="290.0" fill="#94A3B8" font-size="10" text-anchor="end">0.171</text>
+<line x1="70" y1="232.0" x2="710" y2="232.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="236.0" fill="#94A3B8" font-size="10" text-anchor="end">0.342</text>
+<line x1="70" y1="178.0" x2="710" y2="178.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="182.0" fill="#94A3B8" font-size="10" text-anchor="end">0.514</text>
+<line x1="70" y1="124.0" x2="710" y2="124.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="128.0" fill="#94A3B8" font-size="10" text-anchor="end">0.685</text>
+<line x1="70" y1="70.0" x2="710" y2="70.0" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+<text x="60" y="74.0" fill="#94A3B8" font-size="10" text-anchor="end">0.856</text>
+<text x="150.0" y="360" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">Gaussian Copula</text>
+<rect x="91.0" y="203.85573839440616" width="38.0" height="136.14426160559384" rx="3" fill="#8B5CF6"/>
+<text x="110.0" y="199.85573839440616" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">0.4316</text>
+<rect x="131.0" y="187.2635508122601" width="38.0" height="152.7364491877399" rx="3" fill="#38BDF8"/>
+<text x="150.0" y="183.2635508122601" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">0.4842</text>
+<rect x="171.0" y="194.67641028337098" width="38.0" height="145.32358971662902" rx="3" fill="#10B981"/>
+<text x="190.0" y="190.67641028337098" fill="#10B981" font-size="9" font-weight="600" text-anchor="middle">0.4607</text>
+<text x="310.0" y="360" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">TVAE</text>
+<rect x="251.0" y="137.14000315440825" width="38.0" height="202.85999684559175" rx="3" fill="#8B5CF6"/>
+<text x="270.0" y="133.14000315440825" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">0.6431</text>
+<rect x="291.0" y="142.6917617370275" width="38.0" height="197.3082382629725" rx="3" fill="#38BDF8"/>
+<text x="310.0" y="138.6917617370275" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">0.6255</text>
+<rect x="331.0" y="105.21739130434781" width="38.0" height="234.7826086956522" rx="3" fill="#10B981"/>
+<text x="350.0" y="101.21739130434781" fill="#10B981" font-size="9" font-weight="600" text-anchor="middle">0.7443</text>
+<text x="470.0" y="360" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">TabDDPM MLP</text>
+<rect x="411.0" y="191.86898690920557" width="38.0" height="148.13101309079443" rx="3" fill="#8B5CF6"/>
+<text x="430.0" y="187.86898690920557" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">0.4696</text>
+<rect x="451.0" y="148.5589611482046" width="38.0" height="191.4410388517954" rx="3" fill="#38BDF8"/>
+<text x="470.0" y="144.5589611482046" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">0.6069</text>
+<rect x="491.0" y="169.28342358445923" width="38.0" height="170.71657641554077" rx="3" fill="#10B981"/>
+<text x="510.0" y="165.28342358445923" fill="#10B981" font-size="9" font-weight="600" text-anchor="middle">0.5412</text>
+<text x="630.0" y="360" fill="#F8FAFC" font-size="11" font-weight="600" text-anchor="middle">TabSynth Hybrid</text>
+<rect x="571.0" y="194.8972188633615" width="38.0" height="145.1027811366385" rx="3" fill="#8B5CF6"/>
+<text x="590.0" y="190.8972188633615" fill="#8B5CF6" font-size="9" font-weight="600" text-anchor="middle">0.4600</text>
+<rect x="611.0" y="183.32054045528622" width="38.0" height="156.67945954471378" rx="3" fill="#38BDF8"/>
+<text x="630.0" y="179.32054045528622" fill="#38BDF8" font-size="9" font-weight="600" text-anchor="middle">0.4967</text>
+<rect x="651.0" y="190.89112034067608" width="38.0" height="149.10887965932392" rx="3" fill="#10B981"/>
+<text x="670.0" y="186.89112034067608" fill="#10B981" font-size="9" font-weight="600" text-anchor="middle">0.4727</text>
+<line x1="70" y1="70" x2="70" y2="340" stroke="#94A3B8" stroke-width="1.5"/>
+<line x1="70" y1="340" x2="710" y2="340" stroke="#94A3B8" stroke-width="1.5"/>
+</svg>
