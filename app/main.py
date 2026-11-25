@@ -145,57 +145,64 @@ device_label = f"PyTorch • {str(device).upper()}"
 status_badge_html = get_status_badge_html("online", pulse=True) if backend_online else get_status_badge_html("offline")
 
 # =============================================================================
-# Top Header: Brand Identity & Live Engine Telemetry
+# Navigation State Management & Callbacks
 # =============================================================================
-st.html(
-    textwrap.dedent(
-        f"""
-        <div class="ts-top-header">
-            <div class="ts-top-brand">
-                <span class="ts-top-brand-icon">🧬</span>
-                <div>
-                    <div class="ts-top-brand-title">TabSynth Analytics</div>
-                    <div class="ts-top-brand-subtitle">Hybrid Diffusion Research Platform</div>
-                </div>
-            </div>
-            <div class="ts-top-meta">
-                <div class="ts-top-chip">
-                    <span class="ts-chip-dot"></span>
-                    <span>{device_label}</span>
-                </div>
-                <div class="ts-top-status-badge">
-                    <span class="ts-top-status-label">Engine:</span>
-                    {status_badge_html}
-                </div>
-            </div>
-        </div>
-        """
-    ).strip()
-)
-
-# Navigation State Management
 if "nav_page" not in st.session_state or st.session_state["nav_page"] not in PAGE_OPTIONS:
     st.session_state["nav_page"] = "Overview Dashboard"
 
-# =============================================================================
-# Top Navigation Bar: 10 Analytical Research Views
-# =============================================================================
-selected_nav = st.pills(
-    "Navigation Views",
-    PAGE_OPTIONS,
-    default=st.session_state["nav_page"],
-    format_func=lambda x: f"{PAGE_ICONS.get(x, '•')} {x}",
-    label_visibility="collapsed",
-    required=True,
-    key="top_navbar_pills",
-)
+def on_top_nav_change():
+    val = st.session_state.get("top_navbar_pills")
+    if val:
+        st.session_state["nav_page"] = val
 
-if selected_nav and selected_nav != st.session_state["nav_page"]:
-    st.session_state["nav_page"] = selected_nav
+def on_sidebar_nav_change():
+    val = st.session_state.get("sidebar_nav_radio")
+    if val:
+        st.session_state["nav_page"] = val
+
+# =============================================================================
+# Pinned Sticky Top Navigation Header (Always Visible While Scrolling)
+# =============================================================================
+with st.container(key="top_sticky_nav"):
+    st.html(
+        textwrap.dedent(
+            f"""
+            <div class="ts-top-header">
+                <div class="ts-top-brand">
+                    <span class="ts-top-brand-icon">🧬</span>
+                    <div>
+                        <div class="ts-top-brand-title">TabSynth Analytics</div>
+                        <div class="ts-top-brand-subtitle">Hybrid Diffusion Research Platform</div>
+                    </div>
+                </div>
+                <div class="ts-top-meta">
+                    <div class="ts-top-chip">
+                        <span class="ts-chip-dot"></span>
+                        <span>{device_label}</span>
+                    </div>
+                    <div class="ts-top-status-badge">
+                        <span class="ts-top-status-label">Engine:</span>
+                        {status_badge_html}
+                    </div>
+                </div>
+            </div>
+            """
+        ).strip()
+    )
+
+    st.pills(
+        "Navigation Views",
+        PAGE_OPTIONS,
+        default=st.session_state["nav_page"],
+        format_func=lambda x: f"{PAGE_ICONS.get(x, '•')} {x}",
+        label_visibility="collapsed",
+        key="top_navbar_pills",
+        on_change=on_top_nav_change,
+    )
 
 page = st.session_state["nav_page"]
 
-# Secondary Sidebar Telemetry & Quick Diagnostic Jump (When User Expands Sidebar)
+# Secondary Sidebar Navigation & Diagnostics (When User Expands Sidebar)
 st.sidebar.html(
     textwrap.dedent(
         """
@@ -214,10 +221,22 @@ st.sidebar.html(
     </div>
     """
 )
-st.sidebar.caption("System Telemetry")
-st.sidebar.caption(f"Active View: {PAGE_ICONS.get(page, '')} {page}")
+st.sidebar.html(
+    textwrap.dedent(
+        "<div style='font-size:0.7rem; font-weight:700; color:#8B5CF6; letter-spacing:0.08em; margin-bottom:0.4rem; text-transform:uppercase;'>Navigation Views</div>"
+    ).strip()
+)
+st.sidebar.radio(
+    "Sidebar Navigation Views",
+    PAGE_OPTIONS,
+    index=PAGE_OPTIONS.index(page) if page in PAGE_OPTIONS else 0,
+    format_func=lambda x: f"{PAGE_ICONS.get(x, '•')} {x}",
+    label_visibility="collapsed",
+    key="sidebar_nav_radio",
+    on_change=on_sidebar_nav_change,
+)
 st.sidebar.markdown("---")
-st.sidebar.caption("Primary navigation is located in the top navigation bar.")
+st.sidebar.caption("Primary navigation is pinned in the top bar.")
 st.sidebar.caption(f"Hardware Platform: {device_label}")
 
 

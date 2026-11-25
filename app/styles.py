@@ -466,6 +466,33 @@ code, pre {
 /* =========================================================================
    Top Navigation Bar & Header System
    ========================================================================= */
+
+/* Reduce excessive Streamlit top padding so top header and nav are immediately visible */
+.block-container, [data-testid="stMainBlockContainer"] {
+    padding-top: 3.25rem !important;
+    padding-bottom: 2.5rem !important;
+    max-width: 98% !important;
+}
+
+/* Ensure Streamlit header blends into dark theme */
+header[data-testid="stHeader"] {
+    background-color: rgba(10, 13, 20, 0.92) !important;
+    backdrop-filter: blur(12px) !important;
+}
+
+/* Pinned Sticky Top Navigation Container */
+.st-key-top_sticky_nav {
+    position: sticky !important;
+    top: 2.875rem !important;
+    z-index: 9999 !important;
+    background-color: #0A0D14 !important;
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.65rem !important;
+    border-bottom: 1px solid #1E283D !important;
+    margin-bottom: 0.85rem !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
 .ts-top-header {
     display: flex;
     justify-content: space-between;
@@ -473,45 +500,45 @@ code, pre {
     background: linear-gradient(90deg, #131B2E 0%, #0F1420 100%);
     border: 1px solid #1E283D;
     border-radius: 8px;
-    padding: 0.65rem 1.15rem;
-    margin-bottom: 0.6rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 .ts-top-brand {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.65rem;
 }
 .ts-top-brand-icon {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     line-height: 1;
 }
 .ts-top-brand-title {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #F8FAFC;
     letter-spacing: -0.01em;
 }
 .ts-top-brand-subtitle {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     color: #8F9CAE;
     font-weight: 500;
 }
 .ts-top-meta {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
+    gap: 0.75rem;
 }
 .ts-top-chip {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: #94A3B8;
     background: #182238;
     border: 1px solid #1E283D;
     border-radius: 6px;
-    padding: 0.25rem 0.65rem;
+    padding: 0.2rem 0.55rem;
     font-family: 'JetBrains Mono', monospace;
 }
 .ts-chip-dot {
@@ -523,13 +550,13 @@ code, pre {
 .ts-top-status-badge {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.75rem;
+    gap: 0.45rem;
+    font-size: 0.72rem;
     color: #8F9CAE;
     background: #182238;
     border: 1px solid #1E283D;
     border-radius: 6px;
-    padding: 0.25rem 0.65rem;
+    padding: 0.2rem 0.55rem;
 }
 .ts-top-status-label {
     font-weight: 600;
@@ -538,25 +565,23 @@ code, pre {
 
 /* Top Navigation Pills Styling */
 .st-key-top_navbar_pills {
-    margin-bottom: 1.25rem !important;
-    padding-bottom: 0.75rem !important;
-    border-bottom: 1px solid #1E283D !important;
+    margin-bottom: 0.25rem !important;
 }
 .st-key-top_navbar_pills [role="radiogroup"],
 .st-key-top_navbar_pills div[data-testid="stPills"] {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 0.45rem !important;
+    gap: 0.4rem !important;
     align-items: center !important;
 }
 .st-key-top_navbar_pills button {
     background-color: #131B2E !important;
     border: 1px solid #1E283D !important;
     color: #8F9CAE !important;
-    font-size: 0.82rem !important;
+    font-size: 0.8rem !important;
     font-weight: 500 !important;
     border-radius: 6px !important;
-    padding: 0.35rem 0.75rem !important;
+    padding: 0.3rem 0.7rem !important;
     transition: all 0.15s ease-in-out !important;
 }
 .st-key-top_navbar_pills button:hover {

@@ -21,12 +21,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy packaging specifications
-COPY requirements.txt pyproject.toml /build/
+COPY requirements.txt /build/
 
-# Install dependencies into isolated local environment prefix
+# Install dependencies into isolated local environment prefix (cached layer)
 RUN pip install --upgrade pip setuptools wheel && \
-    pip install --prefix=/install -r requirements.txt && \
-    pip install --prefix=/install -e .
+    pip install --prefix=/install -r requirements.txt
+
+# Copy package source tree and build/install distribution package
+COPY pyproject.toml README.md /build/
+COPY src/ /build/src/
+RUN pip install --prefix=/install --no-deps .
 
 # ------------------------------------------------------------------------------
 # Stage 2: Production Runtime (Minimal, secure, non-root execution)
@@ -48,7 +52,7 @@ ENV PYTHONUNBUFFERED=1 \
     TABSYNTH_DB_PATH=/app/data/tabsynth.db \
     TABSYNTH_DEVICE=cpu \
     PATH="/install/bin:$PATH" \
-    PYTHONPATH="/app:/install/lib/python3.11/site-packages:$PYTHONPATH"
+    PYTHONPATH="/app:/app/src:/install/lib/python3.11/site-packages"
 
 # Install minimal runtime shared libraries (curl for healthchecks, libgomp for PyTorch OpenMP)
 RUN apt-get update && apt-get install -y --no-install-recommends \

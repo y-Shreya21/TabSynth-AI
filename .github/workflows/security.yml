@@ -21,12 +21,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Secret Pattern Scanning
+      - name: Secret & Credential Scanning
         run: |
-          echo "[*] Scanning for potential private keys and token patterns..."
-          ! grep -rnE --exclude-dir={.git,.venv,artifacts} "(PRIVATE KEY|BEGIN RSA|api[_-]?key.*=.*['\"][a-zA-Z0-9]{20,}['\"])" .
+          python scripts/security_audit.py --check-secrets
 
-      - name: Data Privacy Inspection
+      - name: Data Privacy & Artifact Tracking Audit
         run: |
-          echo "[*] Verifying that no raw or synthetic CSV files are tracked in Git..."
-          ! git ls-files | grep -E "(data/raw/.*\.csv|data/synthetic/.*\.csv|checkpoints/.*\.pt)"
+          python scripts/security_audit.py --check-privacy
